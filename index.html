@@ -93,9 +93,8 @@
                 </div>
 
                 <div class="profile">
-                    <!-- Replace the D with your own avatar later. -->
-                    <div class="avatar" aria-label="DoniDonka avatar placeholder">
-                        <span>D</span>
+                    <div class="avatar" aria-label="DoniDonka monogram">
+                        <span>D/</span>
                     </div>
 
                     <p class="eyebrow">PERSONAL SPACE / 001</p>
@@ -107,12 +106,16 @@
                     </p>
 
                     <p class="profile-description">
-                        A few links, projects, and things I've made.
+                        building websites, tools, and random projects.
                     </p>
+                    <div class="hero-actions">
+                        <a class="primary-action" href="#projects">explore projects <span>↘</span></a>
+                        <a class="secondary-action" href="https://github.com/DoniDonka" target="_blank" rel="noopener noreferrer">github <span>↗</span></a>
+                    </div>
 
-                    <!-- Optional music player. Audio stays paused until the visitor presses play. -->
+                    <!-- Browsers block audible autoplay in many cases, so the track starts muted where allowed. -->
                     <div class="music-player" aria-label="Background music player">
-                        <audio id="background-audio" preload="none" loop>
+                        <audio id="background-audio" preload="auto" autoplay muted loop>
                             <source src="assets/moog-city.mp3" type="audio/mpeg">
                         </audio>
 
@@ -123,10 +126,10 @@
                         </button>
 
                         <div class="music-details">
-                            <p class="music-eyebrow">OPTIONAL AUDIO</p>
+                            <p class="music-eyebrow">NOW PLAYING / AMBIENT</p>
                             <p class="music-title">Moog City <span>· slowed + reverb</span></p>
                             <p class="music-status" id="music-status" aria-live="polite">
-                                press play to listen
+                                starting quietly · tap sound to enable audio
                             </p>
 
                             <div class="music-timeline">
@@ -140,7 +143,7 @@
 
                         <label class="music-volume-control">
                             <span class="visually-hidden">Music volume</span>
-                            <span class="volume-symbol" aria-hidden="true">VOL</span>
+                            <span class="volume-symbol" aria-hidden="true">SOUND</span>
                             <input id="music-volume" type="range" min="0" max="100"
                                    value="30" aria-label="Music volume">
                         </label>
@@ -234,6 +237,13 @@
 
             </section>
 
+            <section class="status-strip" aria-label="Current status">
+                <div class="status-item"><span class="status-dot"></span><span>STATUS</span><strong>building stuff</strong></div>
+                <div class="status-item"><span class="status-label">BASED IN</span><strong>the internet</strong></div>
+                <div class="status-item"><span class="status-label">CURRENT FOCUS</span><strong>web / python</strong></div>
+                <div class="status-item"><span class="status-label">SITE</span><strong>donidonka.info</strong></div>
+            </section>
+
             <!-- About -->
             <section class="content-section" id="about">
                 <div class="section-heading">
@@ -245,9 +255,9 @@
                 <div class="about-panel">
                     <p class="section-kicker">// a little context</p>
                     <p class="about-text">
-                        I work on web projects, Python scripts, and automation.
-                        This site is where I'll keep my links and some of the
-                        things I make.
+                        I'm a self-taught developer who likes building things, testing ideas,
+                        and figuring stuff out along the way. Most of my work is web development,
+                        Python, and automation. This site is a home for my projects and links.
                     </p>
                     <div class="tag-list" aria-label="Interests">
                         <span class="tag">web development</span>
@@ -265,20 +275,28 @@
                     <span class="section-line"></span>
                 </div>
 
-                <div class="project-placeholder">
-                    <span class="project-placeholder-icon">
-                        <svg>
-                            <use href="#icon-code"></use>
-                        </svg>
-                    </span>
-                    <div>
-                        <p class="project-placeholder-title">
-                            Projects will go here.
-                        </p>
-                        <p class="project-placeholder-description">
-                            A place for things I'm building and maintaining.
-                        </p>
-                    </div>
+                <div class="project-grid">
+                    <a class="project-card" href="https://github.com/DoniDonka/SecureText" target="_blank" rel="noopener noreferrer">
+                        <div class="project-card-top"><span class="project-number">PROJECT / 01</span><span class="project-open">↗</span></div>
+                        <div class="project-glyph">ST<span>.</span></div>
+                        <h3>SecureText</h3>
+                        <p>A class-based chat project with approval flow, rules, and admin tools.</p>
+                        <div class="project-tags"><span>firebase</span><span>javascript</span><span>web</span></div>
+                    </a>
+                    <a class="project-card" href="https://github.com/DoniDonka" target="_blank" rel="noopener noreferrer">
+                        <div class="project-card-top"><span class="project-number">PROJECT / 02</span><span class="project-open">↗</span></div>
+                        <div class="project-glyph">NX<span>.</span></div>
+                        <h3>Neurux</h3>
+                        <p>A Windows system monitor concept with a compact control-center interface.</p>
+                        <div class="project-tags"><span>python</span><span>pyqt6</span><span>windows</span></div>
+                    </a>
+                    <a class="project-card" href="https://github.com/DoniDonka/websitestest" target="_blank" rel="noopener noreferrer">
+                        <div class="project-card-top"><span class="project-number">PROJECT / 03</span><span class="project-open">↗</span></div>
+                        <div class="project-glyph">CK<span>.</span></div>
+                        <h3>CK:RP tools</h3>
+                        <p>A player blacklist interface backed by a small API service.</p>
+                        <div class="project-tags"><span>fastapi</span><span>api</span><span>web</span></div>
+                    </a>
                 </div>
             </section>
         </main>
