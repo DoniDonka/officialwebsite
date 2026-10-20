@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="DoniDonka rifle emblem">
+<defs><linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d5d6d7"/><stop offset=".48" stop-color="#777a7d"/><stop offset="1" stop-color="#3d4043"/></linearGradient><filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter></defs>
+<circle cx="256" cy="256" r="238" fill="#08090a" stroke="#292b2e" stroke-width="2"/>
+<circle cx="256" cy="256" r="219" fill="none" stroke="#181a1c" stroke-width="1"/>
+<g transform="translate(24 10) rotate(-39 230 250)">
+<ellipse cx="230" cy="300" rx="175" ry="18" fill="#000" opacity=".65" filter="url(#shadow)"/>
+<path d="M93 222 L118 198 L156 201 L177 219 L162 240 L121 242 Z" fill="url(#steel)" stroke="#252729" stroke-width="5"/>
+<path d="M153 218 L178 211 L312 211 L312 239 L175 239 L157 232 Z" fill="url(#steel)" stroke="#252729" stroke-width="5"/>
+<path d="M300 218 L415 218 L424 226 L415 234 L300 234 Z" fill="url(#steel)" stroke="#252729" stroke-width="4"/>
+<path d="M404 217 L447 217 L456 226 L447 235 L404 235 Z" fill="#777a7d" stroke="#252729" stroke-width="4"/>
+<path d="M186 239 L303 239 L303 251 L190 251 Z" fill="#535659" stroke="#252729" stroke-width="3"/>
+<path d="M195 252 L285 252 L275 285 L250 292 L220 280 Z" fill="#44474a" stroke="#242628" stroke-width="4"/>
+<path d="M212 278 L244 282 L239 339 L222 353 L205 342 Z" fill="url(#steel)" stroke="#252729" stroke-width="5"/>
+<path d="M188 244 L168 256 L170 278 L189 278 L203 252 Z" fill="#303235" stroke="#202224" stroke-width="4"/>
+<path d="M178 249 L202 254 L196 264 L175 260 Z" fill="#b8babc"/>
+<path d="M305 215 L316 204 L327 204 L327 241 L315 241 Z" fill="#4c4f52" stroke="#252729" stroke-width="4"/>
+<path d="M320 218 L383 218 L383 232 L320 232 Z" fill="#999c9f" stroke="#252729" stroke-width="3"/>
+<path d="M122 200 L108 185 L98 190 L111 210 Z" fill="#b8bbbe" stroke="#252729" stroke-width="4"/>
+<path d="M176 211 L183 196 L275 196 L284 211 Z" fill="#a5a8ab" stroke="#252729" stroke-width="4"/>
+<path d="M190 201 L270 201" stroke="#e0e1e2" stroke-width="3" opacity=".65"/>
+<path d="M183 217 L301 217" stroke="#e0e1e2" stroke-width="2" opacity=".55"/>
+<path d="M178 231 L299 231" stroke="#242628" stroke-width="2"/>
+<path d="M290 209 L300 209 L300 239 L290 239 Z" fill="#c3c5c7" stroke="#252729" stroke-width="3"/>
+<path d="M309 239 L321 239 L321 252 L309 252 Z" fill="#5a5d60"/>
+<path d="M166 244 L178 244 L178 254 L166 254 Z" fill="#b8bbbe"/>
+</g>
+<text x="256" y="450" text-anchor="middle" fill="#777b80" font-family="monospace" font-size="18" letter-spacing="5">DONIDONKA</text>
+</svg>
