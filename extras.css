@@ -15,7 +15,7 @@ html { scrollbar-color:#333 #050505; scrollbar-width:thin; }
 
 /* soft page fade when content is swapped in, and a quick first-load fade */
 .site-shell > main { animation:dd-in .38s ease both; }
-@keyframes dd-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+@keyframes dd-in { from { opacity:0; transform:translate(calc(var(--dd-dir, 0) * 16px), 6px); } to { opacity:1; transform:none; } }
 
 /* nav underline that slides in, and arrows that nudge on hover */
 .nav-link { background:linear-gradient(#cfcfcf,#cfcfcf) left bottom / 0 1px no-repeat; transition:background-size .25s ease, color .2s; }
@@ -67,3 +67,11 @@ body::before { background-position:50% calc(50% + var(--wm, 0px)); }
 .not-found-links { margin-top:18px; color:#858585; }
 
 .back-to-top { bottom:124px; }
+
+/* page transition: old page slides out a little, new one slides in from the same side */
+.site-shell > main.is-leaving { opacity:0; transform:translateX(calc(var(--dd-dir, 1) * -16px)); transition:opacity .16s ease, transform .16s ease; pointer-events:none; }
+main:focus { outline:none; }
+.dd-nav-bar { position:fixed; z-index:1001; left:0; top:0; height:2px; width:0; background:#8a8a8a; opacity:0; pointer-events:none; }
+.dd-nav-bar.is-on { opacity:1; width:70%; transition:width 2.5s cubic-bezier(.1,.7,.2,1); }
+.repo-live { display:block; margin-top:12px; color:#858585; font-size:11px; letter-spacing:.02em; }
+@media (prefers-reduced-motion: reduce) { .site-shell > main.is-leaving { transition:none; } .dd-nav-bar.is-on { transition:none; } }
