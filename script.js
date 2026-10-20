@@ -281,3 +281,151 @@ document.addEventListener("DOMContentLoaded", () => {
     const footer = document.querySelector(".site-footer");
     if (footer) footer.appendChild(copyLink);
 });
+
+
+/* extra site details: practical stuff, no giant framework or popup circus */
+(function () {
+    "use strict";
+    const ready = (fn) => document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", fn, { once: true }) : fn();
+    ready(() => {
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        // Persistent monochrome appearance toggle. Keeps the page dark by default.
+        const header = document.querySelector(".site-header");
+        if (header && !document.querySelector(".site-preferences")) {
+            const tools = document.createElement("div");
+            tools.className = "site-preferences";
+            tools.innerHTML = '<button type="button" class="quiet-toggle" id="contrast-toggle" aria-pressed="false" title="switch between soft gray and high contrast">contrast</button><button type="button" class="quiet-toggle" id="motion-toggle" aria-pressed="false" title="reduce site animations">motion</button>';
+            header.appendChild(tools);
+            const contrastButton = tools.querySelector("#contrast-toggle");
+            const motionButton = tools.querySelector("#motion-toggle");
+            try {
+                if (localStorage.getItem("dd-high-contrast") === "1") document.documentElement.classList.add("high-contrast");
+                if (localStorage.getItem("dd-reduce-motion") === "1") document.documentElement.classList.add("user-reduced-motion");
+            } catch {}
+            contrastButton.setAttribute("aria-pressed", String(document.documentElement.classList.contains("high-contrast")));
+            motionButton.setAttribute("aria-pressed", String(document.documentElement.classList.contains("user-reduced-motion")));
+            contrastButton.addEventListener("click", () => {
+                const enabled = document.documentElement.classList.toggle("high-contrast");
+                contrastButton.setAttribute("aria-pressed", String(enabled));
+                try { localStorage.setItem("dd-high-contrast", enabled ? "1" : "0"); } catch {}
+            });
+            motionButton.addEventListener("click", () => {
+                const enabled = document.documentElement.classList.toggle("user-reduced-motion");
+                motionButton.setAttribute("aria-pressed", String(enabled));
+                try { localStorage.setItem("dd-reduce-motion", enabled ? "1" : "0"); } catch {}
+            });
+        }
+
+        // Add copy actions where they help, with a fallback for older browsers.
+        const copyText = async (value) => {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(value);
+                return true;
+            }
+            const field = document.createElement("textarea");
+            field.value = value; field.setAttribute("readonly", "");
+            field.style.position = "fixed"; field.style.opacity = "0";
+            document.body.appendChild(field); field.select();
+            const ok = document.execCommand("copy"); field.remove();
+            return ok;
+        };
+        document.querySelectorAll(".brand-mark").forEach((mark) => {
+            mark.title = "copy donidonka.info";
+            mark.tabIndex = 0;
+            mark.setAttribute("role", "button");
+            mark.setAttribute("aria-label", "copy website address");
+            const copyDomain = async () => {
+                try { await copyText("https://donidonka.info"); mark.classList.add("copied"); mark.textContent = "✓"; window.setTimeout(() => { mark.textContent = "D/"; mark.classList.remove("copied"); }, 1200); } catch {}
+            };
+            mark.addEventListener("click", copyDomain);
+            mark.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); copyDomain(); } });
+        });
+
+        // Project search and category filters.
+        const search = document.getElementById("project-search");
+        const cards = Array.from(document.querySelectorAll(".project-filter-card"));
+        if (search && cards.length) {
+            let activeFilter = "all";
+            const result = document.getElementById("project-result");
+            const empty = document.querySelector(".empty-filter-message");
+            const filters = Array.from(document.querySelectorAll("[data-project-filter]"));
+            const runFilter = () => {
+                const query = search.value.trim().toLowerCase();
+                let visible = 0;
+                cards.forEach((card) => {
+                    const text = (card.textContent + " " + (card.dataset.tags || "")).toLowerCase();
+                    const categoryMatch = activeFilter === "all" || (card.dataset.tags || "").split(/\s+/).includes(activeFilter);
+                    const queryMatch = !query || text.includes(query);
+                    const show = categoryMatch && queryMatch;
+                    card.hidden = !show;
+                    if (show) visible++;
+                });
+                if (result) result.textContent = visible + (visible === 1 ? " project" : " projects");
+                if (empty) empty.hidden = visible !== 0;
+            };
+            search.addEventListener("input", runFilter);
+            filters.forEach((button) => button.addEventListener("click", () => {
+                activeFilter = button.dataset.projectFilter;
+                filters.forEach((item) => item.classList.toggle("is-active", item === button));
+                runFilter();
+            }));
+            runFilter();
+        }
+
+        // Small cursor-follow glow on cards only; never follows the pointer across the whole page.
+        if (!reduceMotion && !document.documentElement.classList.contains("user-reduced-motion")) {
+            document.querySelectorAll(".link-card, .project-card, .info-card, .gallery-tile").forEach((card) => {
+                card.addEventListener("pointermove", (event) => {
+                    const rect = card.getBoundingClientRect();
+                    card.style.setProperty("--pointer-x", (event.clientX - rect.left) + "px");
+                    card.style.setProperty("--pointer-y", (event.clientY - rect.top) + "px");
+                });
+            });
+        }
+
+        // Image lightbox for real images added to the gallery later; no fake gallery assets.
+        const lightbox = document.createElement("dialog");
+        lightbox.className = "image-lightbox";
+        lightbox.innerHTML = '<button type="button" class="lightbox-close" aria-label="close image">×</button><img alt=""><p></p>';
+        document.body.appendChild(lightbox);
+        lightbox.querySelector(".lightbox-close").addEventListener("click", () => lightbox.close());
+        lightbox.addEventListener("click", (event) => { if (event.target === lightbox) lightbox.close(); });
+        document.querySelectorAll(".gallery-tile img, .content-section img[data-lightbox]").forEach((image) => {
+            image.tabIndex = 0;
+            const open = () => { lightbox.querySelector("img").src = image.currentSrc || image.src; lightbox.querySelector("img").alt = image.alt; lightbox.querySelector("p").textContent = image.alt; lightbox.showModal(); };
+            image.addEventListener("click", open);
+            image.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); open(); } });
+        });
+
+        // Useful keyboard navigation without taking over normal browser shortcuts.
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                if (lightbox.open) lightbox.close();
+                document.querySelector(".main-nav")?.classList.remove("is-open");
+                document.querySelector(".mobile-menu-toggle")?.setAttribute("aria-expanded", "false");
+            }
+            if (event.altKey && event.key.toLowerCase() === "h") window.location.href = "index.html";
+            if (event.altKey && event.key.toLowerCase() === "p") window.location.href = "projects.html";
+        });
+
+        // Remember audio preferences across pages and browser sessions where possible.
+        const audio = document.getElementById("background-audio");
+        const volume = document.getElementById("music-volume");
+        if (audio && volume) {
+            try {
+                const savedVolume = localStorage.getItem("dd-music-volume");
+                if (savedVolume !== null) { audio.volume = Math.max(0, Math.min(1, Number(savedVolume))); volume.value = String(Math.round(audio.volume * 100)); }
+            } catch {}
+            volume.addEventListener("change", () => { try { localStorage.setItem("dd-music-volume", String(audio.volume)); } catch {} });
+        }
+
+        // Set the page title's active navigation state on multi-page navigation.
+        const currentFile = (window.location.pathname.split("/").pop() || "index.html").toLowerCase();
+        document.querySelectorAll(".main-nav a").forEach((link) => {
+            const target = (link.getAttribute("href") || "").split("#")[0].toLowerCase();
+            if (target && target === currentFile) { link.classList.add("active"); link.setAttribute("aria-current", "page"); }
+            else if (target) { link.classList.remove("active"); link.removeAttribute("aria-current"); }
+        });
+    });
+})();
