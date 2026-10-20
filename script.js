@@ -160,9 +160,17 @@ document.addEventListener("DOMContentLoaded", () => {
         setActiveLink("home");
     }
 
-    // Try to start music automatically. Browsers generally require autoplay to be muted;
-    // visitors can enable sound with the player control.
-    const audio = document.getElementById("background-audio");
+    // one player on every page. remember playback between page changes.
+    let audio = document.getElementById("background-audio");
+    if (!audio) {
+        const player = document.createElement("div");
+        player.className = "music-player music-player-global";
+        player.setAttribute("aria-label", "background music player");
+        player.innerHTML = '<audio id="background-audio" preload="auto" autoplay loop><source src="assets/moog-city.mp3" type="audio/mpeg"></audio><button class="music-play-button" id="music-play-button" type="button" aria-label="play background music" aria-pressed="false"><span class="music-play-symbol" aria-hidden="true">▶</span></button><div class="music-details"><p class="music-eyebrow">music</p><p class="music-title">moog city <span>· slowed + reverb</span></p><p class="music-status" id="music-status" aria-live="polite">tap play if your browser blocks autoplay</p><div class="music-timeline"><span class="music-time" id="music-current-time">0:00</span><input class="music-seek" id="music-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="seek through music"><span class="music-time" id="music-duration">0:00</span></div></div><label class="music-volume-control"><span class="visually-hidden">music volume</span><span class="volume-symbol" aria-hidden="true">volume</span><input id="music-volume" type="range" min="0" max="100" value="30" aria-label="music volume"></label>';
+        document.querySelector(".site-shell")?.appendChild(player);
+        audio = document.getElementById("background-audio");
+    }
+
     const playButton = document.getElementById("music-play-button");
     const playSymbol = playButton?.querySelector(".music-play-symbol");
     const musicStatus = document.getElementById("music-status");
@@ -170,125 +178,106 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentTimeLabel = document.getElementById("music-current-time");
     const durationLabel = document.getElementById("music-duration");
     const volume = document.getElementById("music-volume");
-
-    if (audio && playButton && playSymbol && musicStatus && seek &&
-        currentTimeLabel && durationLabel && volume) {
-        audio.volume = Number(volume.value) / 100;
-        audio.muted = true;
-        playSymbol.textContent = "♪";
-        playButton.setAttribute("aria-label", "Enable background music");
-        musicStatus.textContent = "starting quietly · enable sound with the volume control";
-
+    const musicKey = "donidonka-music-v1";
+    let savedMusic = {};
+    try { savedMusic = JSON.parse(sessionStorage.getItem(musicKey) || "{}"); } catch {}
+    if (audio && playButton && playSymbol && musicStatus && seek && currentTimeLabel && durationLabel && volume) {
+        audio.volume = savedMusic.volume !== undefined ? Number(savedMusic.volume) : Number(volume.value) / 100;
+        volume.value = String(Math.round(audio.volume * 100));
         const formatTime = (seconds) => {
             if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = Math.floor(seconds % 60);
-            return minutes + ":" + String(remainingSeconds).padStart(2, "0");
+            return Math.floor(seconds / 60) + ":" + String(Math.floor(seconds % 60)).padStart(2, "0");
         };
-
+        const saveMusic = () => {
+            try { sessionStorage.setItem(musicKey, JSON.stringify({time: audio.currentTime || 0, volume: audio.volume, playing: !audio.paused, muted: audio.muted})); } catch {}
+        };
         const updatePlaybackUI = () => {
             const playing = !audio.paused;
             playSymbol.textContent = playing ? "Ⅱ" : "▶";
             playButton.classList.toggle("is-playing", playing);
             playButton.setAttribute("aria-pressed", String(playing));
-            playButton.setAttribute(
-                "aria-label",
-                playing ? "Pause background music" : "Play background music"
-            );
-
-            if (audio.error) {
-                musicStatus.textContent = "audio file unavailable";
-            } else if (playing && audio.muted) {
-                musicStatus.textContent = "playing quietly · raise sound to listen";
-            } else if (playing) {
-                musicStatus.textContent = "now playing";
-            } else {
-                musicStatus.textContent = "tap play to start";
-            }
+            playButton.setAttribute("aria-label", playing ? "pause background music" : "play background music");
+            if (audio.error) musicStatus.textContent = "couldn't load the music file";
+            else if (playing && audio.muted) musicStatus.textContent = "playing muted · tap to turn sound on";
+            else if (playing) musicStatus.textContent = "playing";
+            else musicStatus.textContent = "paused · press play to continue";
         };
-
-        playButton.addEventListener("click", async () => {
-            if (!audio.paused && audio.muted) {
-                audio.muted = false;
-                audio.volume = Math.max(Number(volume.value) / 100, 0.15);
-                updatePlaybackUI();
-                return;
-            }
-            if (!audio.paused) {
-                audio.pause();
-                return;
-            }
-
-            musicStatus.textContent = "loading audio…";
-            audio.muted = false;
-            audio.volume = Math.max(Number(volume.value) / 100, 0.15);
-
-            try {
-                await audio.play();
-            } catch (error) {
-                // Retry muted; browsers may allow muted autoplay even when sound is blocked.
-                audio.muted = true;
-                try {
-                    await audio.play();
-                } catch (retryError) {
-                    musicStatus.textContent = "audio file unavailable";
-                    console.warn("Background audio could not be played.", retryError);
-                }
-            }
-            updatePlaybackUI();
-        });
-
-        audio.addEventListener("play", updatePlaybackUI);
-        audio.addEventListener("pause", updatePlaybackUI);
-        audio.addEventListener("ended", updatePlaybackUI);
-
-        audio.addEventListener("error", () => {
-            musicStatus.textContent = "audio file unavailable";
-            updatePlaybackUI();
-        });
-
         audio.addEventListener("loadedmetadata", () => {
             durationLabel.textContent = formatTime(audio.duration);
+            if (Number.isFinite(savedMusic.time) && savedMusic.time > 0 && savedMusic.time < audio.duration) {
+                audio.currentTime = savedMusic.time;
+            }
+            if (savedMusic.playing) audio.play().catch(() => { musicStatus.textContent = "tap play to continue"; });
         });
-
         audio.addEventListener("timeupdate", () => {
             currentTimeLabel.textContent = formatTime(audio.currentTime);
-
-            if (Number.isFinite(audio.duration) && audio.duration > 0) {
-                seek.value = String((audio.currentTime / audio.duration) * 100);
-            }
+            if (Number.isFinite(audio.duration) && audio.duration > 0) seek.value = String(audio.currentTime / audio.duration * 100);
+            saveMusic();
         });
-
+        audio.addEventListener("play", updatePlaybackUI);
+        audio.addEventListener("pause", () => { updatePlaybackUI(); saveMusic(); });
+        audio.addEventListener("ended", updatePlaybackUI);
+        audio.addEventListener("error", () => { musicStatus.textContent = "couldn't load the music file"; });
+        playButton.addEventListener("click", async () => {
+            if (!audio.paused && audio.muted) audio.muted = false;
+            else if (!audio.paused) audio.pause();
+            else {
+                try { audio.muted = false; await audio.play(); }
+                catch { musicStatus.textContent = "your browser blocked autoplay · tap play again"; }
+            }
+            updatePlaybackUI(); saveMusic();
+        });
         seek.addEventListener("input", () => {
-            if (Number.isFinite(audio.duration) && audio.duration > 0) {
-                audio.currentTime = (Number(seek.value) / 100) * audio.duration;
-            }
+            if (Number.isFinite(audio.duration) && audio.duration > 0) audio.currentTime = Number(seek.value) / 100 * audio.duration;
         });
-
         volume.addEventListener("input", () => {
             audio.volume = Number(volume.value) / 100;
             audio.muted = audio.volume === 0;
-            if (audio.volume > 0 && !audio.paused) {
-                audio.muted = false;
-            }
-            updatePlaybackUI();
+            saveMusic(); updatePlaybackUI();
         });
-
-        // Try audible autoplay first. If the browser blocks it, retry muted;
-        // visitors can always use the player button to turn sound on.
-        audio.muted = false;
-        audio.play().then(() => {
-            musicStatus.textContent = "now playing";
-        }).catch(async () => {
-            audio.muted = true;
-            try {
-                await audio.play();
-                musicStatus.textContent = "playing quietly · tap the music button for sound";
-            } catch {
-                musicStatus.textContent = "autoplay blocked · tap play to start";
-            }
-        });
-
+        audio.muted = Boolean(savedMusic.muted);
+        if (savedMusic.playing) {
+            if (Number.isFinite(savedMusic.time) && savedMusic.time > 0) audio.addEventListener("loadedmetadata", () => { audio.currentTime = Math.min(savedMusic.time, audio.duration || savedMusic.time); }, {once:true});
+            audio.play().catch(() => { musicStatus.textContent = "tap play to continue"; });
+        } else {
+            audio.play().catch(() => { musicStatus.textContent = "tap play to start"; });
+        }
         updatePlaybackUI();
     }
+
+    // little quality-of-life bits: reading progress, back-to-top, copy page link.
+    const progress = document.createElement("div");
+    progress.className = "reading-progress";
+    progress.setAttribute("aria-hidden", "true");
+    document.body.appendChild(progress);
+    const topButton = document.createElement("button");
+    topButton.className = "back-to-top";
+    topButton.type = "button";
+    topButton.textContent = "↑";
+    topButton.setAttribute("aria-label", "back to top");
+    document.body.appendChild(topButton);
+    const updateScrollBits = () => {
+        const range = document.documentElement.scrollHeight - window.innerHeight;
+        progress.style.width = (range > 0 ? window.scrollY / range * 100 : 0) + "%";
+        topButton.classList.toggle("is-visible", window.scrollY > 320);
+    };
+    window.addEventListener("scroll", updateScrollBits, {passive:true});
+    updateScrollBits();
+    topButton.addEventListener("click", () => window.scrollTo({top:0, behavior: reduceMotion ? "auto" : "smooth"}));
+
+    const copyLink = document.createElement("button");
+    copyLink.className = "copy-page-link";
+    copyLink.type = "button";
+    copyLink.textContent = "copy page link";
+    copyLink.addEventListener("click", async () => {
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            copyLink.textContent = "copied";
+        } catch {
+            copyLink.textContent = "copy not available";
+        }
+        window.setTimeout(() => { copyLink.textContent = "copy page link"; }, 1800);
+    });
+    const footer = document.querySelector(".site-footer");
+    if (footer) footer.appendChild(copyLink);
 });
