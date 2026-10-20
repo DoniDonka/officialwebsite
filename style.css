@@ -1552,3 +1552,66 @@ a.info-card:hover { transform:translateY(-3px); border-color:var(--border-hover)
  .back-to-top { bottom:130px; right:12px; }
  .music-player-global .music-volume-control { max-width:62px; }
 }
+
+
+/* October polish: quieter monochrome, more contrast, less template-like blue */
+:root {
+    --background: #020303;
+    --surface: rgba(7, 7, 7, .94);
+    --surface-hover: rgba(15, 15, 15, .98);
+    --border: #1d1d1d;
+    --border-hover: #505050;
+    --text: #e7e7e7;
+    --muted: #929292;
+    --subtle: #666;
+    --accent: #cfcfcf;
+    --accent-bright: #f4f4f4;
+    --accent-dim: #555;
+}
+/* Keep the starfield, but remove the obvious blue tint. */
+.site-shell::before {
+    background:
+        radial-gradient(ellipse at 50% 27%, rgba(85,85,85,.12), transparent 49%),
+        radial-gradient(ellipse at 85% 82%, rgba(58,58,58,.08), transparent 42%),
+        #020303;
+}
+.site-shell::after {
+    opacity: .38;
+    background-image:
+        radial-gradient(1px 1px at 7% 18%, #b8b8b8 99%, transparent),
+        radial-gradient(1px 1px at 19% 72%, #858585 99%, transparent),
+        radial-gradient(1px 1px at 32% 33%, #d4d4d4 99%, transparent),
+        radial-gradient(1px 1px at 45% 81%, #777 99%, transparent),
+        radial-gradient(1px 1px at 61% 21%, #aaa 99%, transparent),
+        radial-gradient(1px 1px at 73% 61%, #d0d0d0 99%, transparent),
+        radial-gradient(1px 1px at 86% 29%, #8c8c8c 99%, transparent),
+        radial-gradient(1px 1px at 94% 78%, #b8b8b8 99%, transparent);
+    background-size: 310px 270px, 380px 330px, 430px 390px, 350px 310px, 390px 360px, 420px 400px, 360px 330px, 450px 410px;
+}
+.primary-action {
+    color: #e9e9e9;
+    background: linear-gradient(120deg, rgba(64,64,64,.42), rgba(12,12,12,.84));
+    border-color: #454545;
+}
+.secondary-action { color: #b6b6b6; }
+.primary-action:hover, .secondary-action:hover { border-color: #858585; }
+.music-player:hover, .music-player:focus-within { border-color: #575757; }
+.music-play-button { border-color: #414141; }
+.music-eyebrow, .music-title span, .music-status, .music-time, .volume-symbol,
+.status-item > span, .status-label, .info-card p, .project-card p,
+.project-tags span, .page-hero p, .gallery-art {
+    color: #929292;
+}
+.project-open, .project-glyph span { color: #b8b8b8; }
+.project-card h3, .info-card h2, .info-card h3, .page-hero h1,
+.update-item h2, .status-item strong { color: #e0e0e0; }
+.project-tags span { border-color: #303030; background: rgba(12,12,12,.75); }
+.about-panel, .project-card, .info-card {
+    background: linear-gradient(145deg, rgba(15,15,15,.91), rgba(5,5,5,.9));
+    border-color: #282828;
+}
+.project-card:hover, a.info-card:hover { border-color: #626262; }
+body::before { filter: grayscale(1) contrast(1.05); }
+@media (prefers-reduced-motion: reduce) {
+    .site-shell::after { animation: none; }
+}
