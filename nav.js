@@ -3,15 +3,28 @@
 (function () {
     "use strict";
     const shellSel = ".site-shell", playerSel = ".music-player-global";
-    let busy = false;
+    let busy = false, lastPath = location.pathname;
+    const cache = new Map();
+    const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("user-reduced-motion");
+    const order = () => Array.from(document.querySelectorAll(".main-nav a")).map((a) => new URL(a.href).pathname);
+    const live = document.createElement("div"); live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+    const bar = document.createElement("div"); bar.className = "dd-nav-bar"; bar.setAttribute("aria-hidden", "true");
+    document.addEventListener("DOMContentLoaded", () => document.body.append(live, bar), { once: true });
+    const fetchPage = (href) => { if (!cache.has(href)) cache.set(href, fetch(href, { headers: { Accept: "text/html" } }).catch((e) => { cache.delete(href); throw e; })); return cache.get(href); };
 
     const internal = (a) => a.origin === location.origin && /\.html?$|\/$/.test(a.pathname) &&
         !a.hasAttribute("download") && (!a.target || a.target === "_self");
 
     async function go(url, push) {
         if (busy) return; busy = true;
+        const slowTimer = setTimeout(() => bar.classList.add("is-on"), 250);
         try {
-            const res = await fetch(url.href, { headers: { Accept: "text/html" } });
+            const o = order(), from = o.indexOf(location.pathname), to = o.indexOf(url.pathname);
+            document.documentElement.style.setProperty("--dd-dir", from === -1 || to === -1 || to >= from ? "1" : "-1");
+            const leaving = document.querySelector(shellSel + " > main");
+            if (leaving && !reduced()) leaving.classList.add("is-leaving");
+            const pause = reduced() ? Promise.resolve() : new Promise((r) => setTimeout(r, 170));
+            const [pageRes] = await Promise.all([fetchPage(url.href), pause]); const res = pageRes.clone();
             if (!res.ok || !/text\/html/.test(res.headers.get("content-type") || "")) throw new Error("bad response");
             const doc = new DOMParser().parseFromString(await res.text(), "text/html");
             const nextShell = doc.querySelector(shellSel), shell = document.querySelector(shellSel);
@@ -27,16 +40,21 @@
             kids.forEach((n, i) => (split !== -1 && i >= split) ? shell.appendChild(n) : shell.insertBefore(n, player));
 
             document.title = doc.title;
+            const canon = doc.querySelector('link[rel="canonical"]'), curCanon = document.querySelector('link[rel="canonical"]');
+            if (canon && curCanon) curCanon.href = canon.href;
             const desc = doc.querySelector('meta[name="description"]'), cur = document.querySelector('meta[name="description"]');
             if (desc && cur) cur.content = desc.content;
             document.body.className = doc.body.className;
-            if (push) history.pushState({}, "", url.href);
+            if (push) { history.replaceState({ y: scrollY }, ""); history.pushState({}, "", url.href); }
+            lastPath = url.pathname;
             window.ddInitMain(); window.ddInitExtra(); if (window.ddInitFx) window.ddInitFx();
             const target = url.hash && document.getElementById(decodeURIComponent(url.hash.slice(1)));
-            if (target) target.scrollIntoView(); else window.scrollTo(0, 0);
+            if (target) target.scrollIntoView(); else window.scrollTo({ top: push ? 0 : (history.state && history.state.y) || 0, left: 0, behavior: "instant" });
+            const main = document.querySelector("main"); if (main) { main.tabIndex = -1; main.focus({ preventScroll: true }); }
+            live.textContent = ""; setTimeout(() => { live.textContent = doc.title; }, 60);
         } catch (err) {
             location.href = url.href;
-        } finally { busy = false; }
+        } finally { clearTimeout(slowTimer); bar.classList.remove("is-on"); busy = false; }
     }
 
     document.addEventListener("click", (e) => {
@@ -46,5 +64,7 @@
         if (a.pathname === location.pathname && a.hash) return; // same-page anchor: let the browser handle it
         e.preventDefault(); go(new URL(a.href), true);
     });
-    window.addEventListener("popstate", () => go(new URL(location.href), false));
+    const warm = (e) => { const a = e.target.closest && e.target.closest("a[href]"); if (a && internal(a) && a.pathname !== location.pathname) fetchPage(a.href).catch(() => {}); };
+    document.addEventListener("pointerover", warm); document.addEventListener("focusin", warm);
+    window.addEventListener("popstate", () => { if (location.pathname !== lastPath) go(new URL(location.href), false); });
 })();
