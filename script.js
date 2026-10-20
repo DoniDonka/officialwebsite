@@ -1,7 +1,10 @@
+window.ddGo=(href)=>{const a=document.querySelector('.main-nav a[href="'+href+'"]');if(a)a.click();else location.href=href;};
+window.ddReady=(fn)=>document.readyState==="loading"?document.addEventListener("DOMContentLoaded",fn,{once:true}):fn();
+window.__ddCleanup=[];
 
 "use strict";
 
-document.addEventListener("DOMContentLoaded", () => {
+window.ddInitMain = () => {
     const reduceMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)"
     ).matches;
@@ -131,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }).format(new Date());
         };
         updateClock();
-        window.setInterval(updateClock, 1000);
+        { const clockTimer = window.setInterval(updateClock, 1000); window.__ddCleanup.push(() => window.clearInterval(clockTimer)); }
     }
 
     // This is intentionally a per-browser count, not a fake global visitor total.
@@ -181,7 +184,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const musicKey = "donidonka-music-v1";
     let savedMusic = {};
     try { savedMusic = JSON.parse(sessionStorage.getItem(musicKey) || "{}"); } catch {}
-    if (audio && playButton && playSymbol && musicStatus && seek && currentTimeLabel && durationLabel && volume) {
+    if (audio && playButton && playSymbol && musicStatus && seek && currentTimeLabel && durationLabel && volume && !audio.dataset.ddBound) {
+        audio.dataset.ddBound = "1";
         audio.volume = savedMusic.volume !== undefined ? Number(savedMusic.volume) : Number(volume.value) / 100;
         volume.value = String(Math.round(audio.volume * 100));
         const formatTime = (seconds) => {
@@ -262,6 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
         topButton.classList.toggle("is-visible", window.scrollY > 320);
     };
     window.addEventListener("scroll", updateScrollBits, {passive:true});
+    window.__ddCleanup.push(() => window.removeEventListener("scroll", updateScrollBits));
     updateScrollBits();
     topButton.addEventListener("click", () => window.scrollTo({top:0, behavior: reduceMotion ? "auto" : "smooth"}));
 
@@ -280,14 +285,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     const footer = document.querySelector(".site-footer");
     if (footer) footer.appendChild(copyLink);
-});
+};
+window.ddReady(window.ddInitMain);
 
 
 /* extra site details: practical stuff, no giant framework or popup circus */
 (function () {
     "use strict";
     const ready = (fn) => document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", fn, { once: true }) : fn();
-    ready(() => {
+    window.ddInitExtra = () => {
         const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
         // Persistent monochrome appearance toggle. Keeps the page dark by default.
@@ -387,32 +393,49 @@ document.addEventListener("DOMContentLoaded", () => {
         // Image lightbox for real images added to the gallery later; no fake gallery assets.
         const lightbox = document.createElement("dialog");
         lightbox.className = "image-lightbox";
-        lightbox.innerHTML = '<button type="button" class="lightbox-close" aria-label="close image">×</button><img alt=""><p></p>';
+        lightbox.setAttribute("aria-label", "image viewer");
+        lightbox.innerHTML = '<button type="button" class="lightbox-close" aria-label="close image">×</button><button type="button" class="lightbox-prev" aria-label="previous image">‹</button><button type="button" class="lightbox-next" aria-label="next image">›</button><img alt=""><p></p>';
         document.body.appendChild(lightbox);
+        window.__ddCleanup.push(() => lightbox.remove());
+        const shots = Array.from(document.querySelectorAll(".gallery-tile img, .content-section img[data-lightbox]"));
+        let shotIndex = 0;
+        const show = (i) => {
+            shotIndex = (i + shots.length) % shots.length;
+            const im = shots[shotIndex], big = lightbox.querySelector("img");
+            big.src = im.currentSrc || im.src; big.alt = im.alt;
+            lightbox.querySelector("p").textContent = (im.dataset.caption || im.alt) + (shots.length > 1 ? "  ·  " + (shotIndex + 1) + " / " + shots.length : "");
+        };
         lightbox.querySelector(".lightbox-close").addEventListener("click", () => lightbox.close());
+        lightbox.querySelector(".lightbox-prev").addEventListener("click", () => show(shotIndex - 1));
+        lightbox.querySelector(".lightbox-next").addEventListener("click", () => show(shotIndex + 1));
+        lightbox.querySelectorAll(".lightbox-prev, .lightbox-next").forEach((btn) => { btn.hidden = shots.length < 2; });
         lightbox.addEventListener("click", (event) => { if (event.target === lightbox) lightbox.close(); });
-        document.querySelectorAll(".gallery-tile img, .content-section img[data-lightbox]").forEach((image) => {
+        shots.forEach((image, i) => {
             image.tabIndex = 0;
-            const open = () => { lightbox.querySelector("img").src = image.currentSrc || image.src; lightbox.querySelector("img").alt = image.alt; lightbox.querySelector("p").textContent = image.alt; lightbox.showModal(); };
+            const open = () => { show(i); lightbox.showModal(); };
             image.addEventListener("click", open);
             image.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); open(); } });
         });
 
         // Useful keyboard navigation without taking over normal browser shortcuts.
-        document.addEventListener("keydown", (event) => {
+        const onKeydown = (event) => {
             if (event.key === "Escape") {
                 if (lightbox.open) lightbox.close();
                 document.querySelector(".main-nav")?.classList.remove("is-open");
                 document.querySelector(".mobile-menu-toggle")?.setAttribute("aria-expanded", "false");
             }
-            if (event.altKey && event.key.toLowerCase() === "h") window.location.href = "index.html";
-            if (event.altKey && event.key.toLowerCase() === "p") window.location.href = "projects.html";
-        });
+            if (lightbox.open && shots.length > 1) { if (event.key === "ArrowRight") show(shotIndex + 1); if (event.key === "ArrowLeft") show(shotIndex - 1); }
+            if (event.altKey && event.key.toLowerCase() === "h") window.ddGo("index.html");
+            if (event.altKey && event.key.toLowerCase() === "p") window.ddGo("projects.html");
+        };
+        document.addEventListener("keydown", onKeydown);
+        window.__ddCleanup.push(() => document.removeEventListener("keydown", onKeydown));
 
         // Remember audio preferences across pages and browser sessions where possible.
         const audio = document.getElementById("background-audio");
         const volume = document.getElementById("music-volume");
-        if (audio && volume) {
+        if (audio && volume && !audio.dataset.ddVolBound) {
+            audio.dataset.ddVolBound = "1";
             try {
                 const savedVolume = localStorage.getItem("dd-music-volume");
                 if (savedVolume !== null) { audio.volume = Math.max(0, Math.min(1, Number(savedVolume))); volume.value = String(Math.round(audio.volume * 100)); }
@@ -427,5 +450,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (target && target === currentFile) { link.classList.add("active"); link.setAttribute("aria-current", "page"); }
             else if (target) { link.classList.remove("active"); link.removeAttribute("aria-current"); }
         });
-    });
+    };
+    ready(window.ddInitExtra);
 })();
