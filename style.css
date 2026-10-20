@@ -1689,6 +1689,8 @@ html.user-reduced-motion *, html.user-reduced-motion *::before, html.user-reduce
     .quick-directory a, .quiet-toggle, .project-filter, .back-to-top { transition:none; }
 }
 
-/* Keep the supplied rifle visible against the near-black avatar background. */
-.avatar-image { filter: grayscale(1) brightness(1.75) contrast(1.08); image-rendering:auto; }
-.avatar { background:#050505; }
+/* Profile picture: the original pencil-rifle artwork, background removed, shown as-is (no filters).
+   assets/profile-rifle-original.jpg is the untouched source file. */
+.avatar { width:120px; height:120px; background:#050505; }
+.avatar-image { filter:none; width:86%; height:86%; object-fit:contain; border-radius:0; image-rendering:auto; }
+@media (max-width: 640px) { .avatar { width:104px; height:104px; } }
