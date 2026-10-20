@@ -116,7 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
         setActiveLink("home");
     }
 
-    // Optional background music. Playback only starts after a visitor clicks play.
+    // Try to start music automatically. Browsers generally require autoplay to be muted;
+    // visitors can enable sound with the player control.
     const audio = document.getElementById("background-audio");
     const playButton = document.getElementById("music-play-button");
     const playSymbol = playButton?.querySelector(".music-play-symbol");
@@ -129,6 +130,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (audio && playButton && playSymbol && musicStatus && seek &&
         currentTimeLabel && durationLabel && volume) {
         audio.volume = Number(volume.value) / 100;
+        audio.muted = true;
+        playSymbol.textContent = "♪";
+        playButton.setAttribute("aria-label", "Enable background music");
+        musicStatus.textContent = "starting quietly · enable sound with the volume control";
 
         const formatTime = (seconds) => {
             if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
@@ -147,30 +152,45 @@ document.addEventListener("DOMContentLoaded", () => {
                 playing ? "Pause background music" : "Play background music"
             );
 
-            if (playing) {
-                musicStatus.textContent = "now playing";
-            } else if (audio.error) {
+            if (audio.error) {
                 musicStatus.textContent = "audio file unavailable";
+            } else if (playing && audio.muted) {
+                musicStatus.textContent = "playing quietly · raise sound to listen";
+            } else if (playing) {
+                musicStatus.textContent = "now playing";
             } else {
-                musicStatus.textContent = "press play to listen";
+                musicStatus.textContent = "tap play to start";
             }
         };
 
         playButton.addEventListener("click", async () => {
+            if (!audio.paused && audio.muted) {
+                audio.muted = false;
+                audio.volume = Math.max(Number(volume.value) / 100, 0.15);
+                updatePlaybackUI();
+                return;
+            }
             if (!audio.paused) {
                 audio.pause();
                 return;
             }
 
             musicStatus.textContent = "loading audio…";
+            audio.muted = false;
+            audio.volume = Math.max(Number(volume.value) / 100, 0.15);
 
             try {
                 await audio.play();
             } catch (error) {
-                musicStatus.textContent = "audio file unavailable";
-                console.warn("Background audio could not be played.", error);
+                // Retry muted; browsers may allow muted autoplay even when sound is blocked.
+                audio.muted = true;
+                try {
+                    await audio.play();
+                } catch (retryError) {
+                    musicStatus.textContent = "audio file unavailable";
+                    console.warn("Background audio could not be played.", retryError);
+                }
             }
-
             updatePlaybackUI();
         });
 
@@ -204,6 +224,17 @@ document.addEventListener("DOMContentLoaded", () => {
         volume.addEventListener("input", () => {
             audio.volume = Number(volume.value) / 100;
             audio.muted = audio.volume === 0;
+            if (audio.volume > 0 && !audio.paused) {
+                audio.muted = false;
+            }
+            updatePlaybackUI();
+        });
+
+        // Attempt autoplay on page load. Audible autoplay may be blocked by browser policy.
+        audio.play().then(() => {
+            musicStatus.textContent = "playing quietly · enable sound with the volume control";
+        }).catch(() => {
+            musicStatus.textContent = "autoplay blocked · tap play to start";
         });
 
         updatePlaybackUI();
