@@ -115,4 +115,97 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         setActiveLink("home");
     }
+
+    // Optional background music. Playback only starts after a visitor clicks play.
+    const audio = document.getElementById("background-audio");
+    const playButton = document.getElementById("music-play-button");
+    const playSymbol = playButton?.querySelector(".music-play-symbol");
+    const musicStatus = document.getElementById("music-status");
+    const seek = document.getElementById("music-seek");
+    const currentTimeLabel = document.getElementById("music-current-time");
+    const durationLabel = document.getElementById("music-duration");
+    const volume = document.getElementById("music-volume");
+
+    if (audio && playButton && playSymbol && musicStatus && seek &&
+        currentTimeLabel && durationLabel && volume) {
+        audio.volume = Number(volume.value) / 100;
+
+        const formatTime = (seconds) => {
+            if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return minutes + ":" + String(remainingSeconds).padStart(2, "0");
+        };
+
+        const updatePlaybackUI = () => {
+            const playing = !audio.paused;
+            playSymbol.textContent = playing ? "Ⅱ" : "▶";
+            playButton.classList.toggle("is-playing", playing);
+            playButton.setAttribute("aria-pressed", String(playing));
+            playButton.setAttribute(
+                "aria-label",
+                playing ? "Pause background music" : "Play background music"
+            );
+
+            if (playing) {
+                musicStatus.textContent = "now playing";
+            } else if (audio.error) {
+                musicStatus.textContent = "audio file unavailable";
+            } else {
+                musicStatus.textContent = "press play to listen";
+            }
+        };
+
+        playButton.addEventListener("click", async () => {
+            if (!audio.paused) {
+                audio.pause();
+                return;
+            }
+
+            musicStatus.textContent = "loading audio…";
+
+            try {
+                await audio.play();
+            } catch (error) {
+                musicStatus.textContent = "audio file unavailable";
+                console.warn("Background audio could not be played.", error);
+            }
+
+            updatePlaybackUI();
+        });
+
+        audio.addEventListener("play", updatePlaybackUI);
+        audio.addEventListener("pause", updatePlaybackUI);
+        audio.addEventListener("ended", updatePlaybackUI);
+
+        audio.addEventListener("error", () => {
+            musicStatus.textContent = "audio file unavailable";
+            updatePlaybackUI();
+        });
+
+        audio.addEventListener("loadedmetadata", () => {
+            durationLabel.textContent = formatTime(audio.duration);
+        });
+
+        audio.addEventListener("timeupdate", () => {
+            currentTimeLabel.textContent = formatTime(audio.currentTime);
+
+            if (Number.isFinite(audio.duration) && audio.duration > 0) {
+                seek.value = String((audio.currentTime / audio.duration) * 100);
+            }
+        });
+
+        seek.addEventListener("input", () => {
+            if (Number.isFinite(audio.duration) && audio.duration > 0) {
+                audio.currentTime = (Number(seek.value) / 100) * audio.duration;
+            }
+        });
+
+        volume.addEventListener("input", () => {
+            audio.volume = Number(volume.value) / 100;
+            audio.muted = audio.volume === 0;
+        });
+
+        updatePlaybackUI();
+    }
 });
