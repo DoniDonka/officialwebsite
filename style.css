@@ -1688,3 +1688,7 @@ html.user-reduced-motion *, html.user-reduced-motion *::before, html.user-reduce
 @media (prefers-reduced-motion: reduce) {
     .quick-directory a, .quiet-toggle, .project-filter, .back-to-top { transition:none; }
 }
+
+/* Keep the supplied rifle visible against the near-black avatar background. */
+.avatar-image { filter: grayscale(1) brightness(1.75) contrast(1.08); image-rendering:auto; }
+.avatar { background:#050505; }
