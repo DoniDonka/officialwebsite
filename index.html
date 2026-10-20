@@ -68,11 +68,15 @@
                 <span class="brand-name">DONIDONKA<span class="brand-cursor">_</span></span>
             </a>
 
-            <nav class="main-nav" aria-label="Main navigation">
-                <a class="nav-link active" href="#home">home</a>
-                <a class="nav-link" href="#about">about</a>
-                <a class="nav-link" href="#projects">projects</a>
-                <a class="nav-link" href="#links">links</a>
+            <button class="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">menu <span aria-hidden="true">＋</span></button>
+            <nav class="main-nav" id="main-navigation" aria-label="Main navigation">
+                <a class="nav-link active" href="index.html">home</a>
+                <a class="nav-link" href="projects.html">projects</a>
+                <a class="nav-link" href="links.html">links</a>
+                <a class="nav-link" href="about.html">about</a>
+                <a class="nav-link" href="gallery.html">gallery</a>
+                <a class="nav-link" href="updates.html">updates</a>
+                <a class="nav-link" href="contact.html">contact</a>
             </nav>
         </header>
 
@@ -238,6 +242,8 @@
             </section>
 
             <section class="status-strip" aria-label="Current status">
+                <div class="status-item"><span class="status-label">LOCAL TIME</span><strong id="live-clock">--:--:--</strong></div>
+                <div class="status-item"><span class="status-label">YOUR VISITS</span><strong id="visit-counter">0</strong></div>
                 <div class="status-item"><span class="status-dot"></span><span>STATUS</span><strong>building stuff</strong></div>
                 <div class="status-item"><span class="status-label">BASED IN</span><strong>the internet</strong></div>
                 <div class="status-item"><span class="status-label">CURRENT FOCUS</span><strong>web / python</strong></div>
@@ -308,7 +314,7 @@
             <span class="footer-line"></span>
 
             <p class="footer-note">
-                designed &amp; built by DoniDonka
+                made by DoniDonka · <a href="updates.html">site updates</a> · <a href="contact.html">contact</a>
             </p>
         </footer>
 
