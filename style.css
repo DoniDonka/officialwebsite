@@ -1237,7 +1237,7 @@ body::before {
     right: -8vw;
     top: 48%;
     transform: translateY(-50%) rotate(-5deg);
-    background: url("assets/rifle.webp") center / contain no-repeat;
+    background: url("assets/rifle.svg") center / contain no-repeat;
     opacity: .19;
     filter: saturate(.78) drop-shadow(0 0 35px rgba(83, 169, 235, .14));
 }
