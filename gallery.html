@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gallery — DoniDonka</title>
-<meta name="description" content="A small visual gallery for projects and website details.">
-<meta name="theme-color" content="#05080e">
+<title>gallery — donidonka</title>
+<meta name="description" content="a small visual gallery for projects and website details.">
+<meta name="theme-color" content="#030405">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
 <nav class="main-nav" id="main-navigation" aria-label="Main navigation">
 <a class="nav-link" href="index.html">home</a><a class="nav-link" href="projects.html">projects</a><a class="nav-link" href="links.html">links</a><a class="nav-link" href="about.html">about</a><a class="nav-link" href="gallery.html">gallery</a><a class="nav-link" href="updates.html">updates</a><a class="nav-link" href="contact.html">contact</a>
 </nav></header><main>
-<section class="page-hero"><div class="page-label">/ GALLERY</div><h1>bits &amp; pieces.</h1><p>A small gallery for the projects, interfaces, and visuals I want to show off. I'll add real screenshots and media as I upload them.</p></section>
+<section class="page-hero"><div class="page-label">/ GALLERY</div><h1>bits &amp; pieces.</h1><p>screenshots and visuals will go here. i'll add the real stuff as i upload it.</p></section>
 <section class="page-content"><div class="gallery-grid">
 <div class="gallery-tile"><div class="gallery-art">ST<span style="color:#5dabe5">.</span></div><span>01 / SecureText</span></div>
 <div class="gallery-tile"><div class="gallery-art">NX<span style="color:#5dabe5">.</span></div><span>02 / Neurux</span></div>
@@ -27,4 +27,9 @@
 <div class="gallery-tile"><div class="gallery-art">D<span style="color:#5dabe5">/</span></div><span>04 / this website</span></div>
 <div class="gallery-tile"><div class="gallery-art">⌁</div><span>05 / more soon</span></div>
 <div class="gallery-tile"><div class="gallery-art">↗</div><span>06 / work in progress</span></div>
-</div></section></main><footer class="site-footer"><span class="footer-line"></span><a href="index.html" class="footer-domain">DONIDONKA.INFO</a><span class="footer-line"></span><p class="footer-note">made by DoniDonka · <a href="updates.html">site updates</a></p></footer></div></body></html>
+</div></section></main>
+<div class="music-player music-player-global" aria-label="background music player">
+<audio id="background-audio" preload="auto" autoplay loop><source src="assets/moog-city.mp3" type="audio/mpeg"></audio>
+<button class="music-play-button" id="music-play-button" type="button" aria-label="play background music" aria-pressed="false"><span class="music-play-symbol" aria-hidden="true">▶</span></button>
+<div class="music-details"><p class="music-eyebrow">music</p><p class="music-title">moog city <span>· slowed + reverb</span></p><p class="music-status" id="music-status" aria-live="polite">tap play if your browser blocks autoplay</p><div class="music-timeline"><span class="music-time" id="music-current-time">0:00</span><input class="music-seek" id="music-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="seek through music"><span class="music-time" id="music-duration">0:00</span></div></div>
+<label class="music-volume-control"><span class="visually-hidden">music volume</span><span class="volume-symbol" aria-hidden="true">volume</span><input id="music-volume" type="range" min="0" max="100" value="30" aria-label="music volume"></label></div><footer class="site-footer"><span class="footer-line"></span><a href="index.html" class="footer-domain">DONIDONKA.INFO</a><span class="footer-line"></span><p class="footer-note">made by donidonka · <a href="updates.html">site updates</a></p></footer></div></body></html>
