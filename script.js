@@ -103,6 +103,50 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Mobile navigation: small menu that works on touch screens too.
+    const menuToggle = document.querySelector(".mobile-menu-toggle");
+    const mainNavigation = document.querySelector(".main-nav");
+    if (menuToggle && mainNavigation) {
+        menuToggle.addEventListener("click", () => {
+            const open = menuToggle.getAttribute("aria-expanded") !== "true";
+            menuToggle.setAttribute("aria-expanded", String(open));
+            mainNavigation.classList.toggle("is-open", open);
+            menuToggle.querySelector("span").textContent = open ? "－" : "＋";
+        });
+        mainNavigation.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+                mainNavigation.classList.remove("is-open");
+                menuToggle.setAttribute("aria-expanded", "false");
+                menuToggle.querySelector("span").textContent = "＋";
+            });
+        });
+    }
+
+    // A small live clock, based on the visitor's own device.
+    const liveClock = document.getElementById("live-clock");
+    if (liveClock) {
+        const updateClock = () => {
+            liveClock.textContent = new Intl.DateTimeFormat(undefined, {
+                hour: "2-digit", minute: "2-digit", second: "2-digit"
+            }).format(new Date());
+        };
+        updateClock();
+        window.setInterval(updateClock, 1000);
+    }
+
+    // This is intentionally a per-browser count, not a fake global visitor total.
+    const visitCounter = document.getElementById("visit-counter");
+    if (visitCounter) {
+        try {
+            const key = "donidonka-site-visits-v1";
+            const visits = Number(localStorage.getItem(key) || "0") + 1;
+            localStorage.setItem(key, String(visits));
+            visitCounter.textContent = visits.toLocaleString();
+        } catch {
+            visitCounter.textContent = "—";
+        }
+    }
+
     // Start at the top with Home selected.
     if (window.location.hash) {
         const currentSection = document.querySelector(
@@ -230,11 +274,19 @@ document.addEventListener("DOMContentLoaded", () => {
             updatePlaybackUI();
         });
 
-        // Attempt autoplay on page load. Audible autoplay may be blocked by browser policy.
+        // Try audible autoplay first. If the browser blocks it, retry muted;
+        // visitors can always use the player button to turn sound on.
+        audio.muted = false;
         audio.play().then(() => {
-            musicStatus.textContent = "playing quietly · enable sound with the volume control";
-        }).catch(() => {
-            musicStatus.textContent = "autoplay blocked · tap play to start";
+            musicStatus.textContent = "now playing";
+        }).catch(async () => {
+            audio.muted = true;
+            try {
+                await audio.play();
+                musicStatus.textContent = "playing quietly · tap the music button for sound";
+            } catch {
+                musicStatus.textContent = "autoplay blocked · tap play to start";
+            }
         });
 
         updatePlaybackUI();
