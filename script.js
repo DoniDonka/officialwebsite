@@ -394,7 +394,7 @@ window.ddReady(window.ddInitMain);
         const lightbox = document.createElement("dialog");
         lightbox.className = "image-lightbox";
         lightbox.setAttribute("aria-label", "image viewer");
-        lightbox.innerHTML = '<button type="button" class="lightbox-close" aria-label="close image">×</button><button type="button" class="lightbox-prev" aria-label="previous image">‹</button><button type="button" class="lightbox-next" aria-label="next image">›</button><img alt=""><p></p>';
+        lightbox.innerHTML = '<button type="button" class="lightbox-close" aria-label="close image">×</button><button type="button" class="lightbox-prev" aria-label="previous image">‹</button><button type="button" class="lightbox-next" aria-label="next image">›</button><img alt=""><p></p><a class="lightbox-save" download>save image</a>';
         document.body.appendChild(lightbox);
         window.__ddCleanup.push(() => lightbox.remove());
         const shots = Array.from(document.querySelectorAll(".gallery-tile img, .content-section img[data-lightbox]"));
@@ -402,7 +402,7 @@ window.ddReady(window.ddInitMain);
         const show = (i) => {
             shotIndex = (i + shots.length) % shots.length;
             const im = shots[shotIndex], big = lightbox.querySelector("img");
-            big.src = im.currentSrc || im.src; big.alt = im.alt;
+            big.src = im.currentSrc || im.src; big.alt = im.alt; lightbox.querySelector(".lightbox-save").href = big.src;
             lightbox.querySelector("p").textContent = (im.dataset.caption || im.alt) + (shots.length > 1 ? "  ·  " + (shotIndex + 1) + " / " + shots.length : "");
         };
         lightbox.querySelector(".lightbox-close").addEventListener("click", () => lightbox.close());

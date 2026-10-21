@@ -12,11 +12,12 @@
         t.firstChild.textContent = title; t.lastChild.textContent = msg; box.appendChild(t);
         setTimeout(() => { t.classList.add("is-out"); setTimeout(() => t.remove(), 300); }, ms);
     };
+    if (navigator.connection && navigator.connection.saveData) document.documentElement.classList.add("dd-lite");
     document.addEventListener("visibilitychange", () => document.documentElement.classList.toggle("dd-paused", document.hidden));
     const shootLoop = () => {
         const wait = 14000 + Math.random() * 18000;
         setTimeout(() => {
-            if (!document.hidden && !prefersLess() && !document.documentElement.classList.contains("user-reduced-motion")) {
+            if (!document.hidden && !prefersLess() && !document.documentElement.classList.contains("user-reduced-motion") && !document.documentElement.classList.contains("dd-lite")) {
                 const el = document.createElement("div"); el.className = "dd-shoot"; document.body.appendChild(el);
                 const x = Math.random() * innerWidth * .6, y = Math.random() * innerHeight * .4;
                 el.animate([{ transform: `translate(${x}px,${y}px) rotate(28deg)`, opacity: 0 }, { opacity: .8, offset: .2 }, { transform: `translate(${x + 420}px,${y + 222}px) rotate(28deg)`, opacity: 0 }], { duration: 1100, easing: "ease-out" }).onfinish = () => el.remove();
@@ -57,6 +58,36 @@
         loop.addEventListener("click", () => { setLoop(!audio.loop); store.set("dd-music-loop", audio.loop ? "1" : "0"); });
         window.ddPlayerApi = { setMini, setLoop };
         p.append(loop, mute, mini);
+        // equalizer driven by the real audio. only wired up after a user gesture, so it can never silence the music.
+        const cv = document.createElement("canvas"); cv.className = "music-eq"; cv.width = 44; cv.height = 18; cv.setAttribute("aria-hidden", "true");
+        const playBtn = p.querySelector("button"); if (playBtn) playBtn.after(cv); else p.prepend(cv);
+        const g = cv.getContext("2d"); let an = null, bins = null, raf = 0, wired = false;
+        const draw = () => {
+            cancelAnimationFrame(raf); g.clearRect(0, 0, 44, 18); if (an) an.getByteFrequencyData(bins);
+            const live = an && !audio.paused && !prefersLess() && !document.documentElement.classList.contains("user-reduced-motion");
+            for (let i = 0; i < 8; i++) { const h = Math.max(2, (live ? bins[i + 1] / 255 : 0.1) * 18); g.fillStyle = "#bdbdbd"; g.fillRect(i * 5.5, 18 - h, 3, h); }
+            if (live && !document.hidden) raf = requestAnimationFrame(draw);
+        };
+        const wire = async () => {
+            if (wired) return; wired = true;
+            try {
+                const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+                const ac = new AC(); await ac.resume();
+                if (ac.state !== "running") { wired = false; ac.close(); return; }
+                const src = ac.createMediaElementSource(audio); an = ac.createAnalyser(); an.fftSize = 64; an.smoothingTimeConstant = 0.8;
+                src.connect(an); an.connect(ac.destination); bins = new Uint8Array(an.frequencyBinCount); cv.dataset.live = "1"; draw();
+            } catch { wired = false; }
+        };
+        ["click", "keydown", "touchend"].forEach((ev) => document.addEventListener(ev, wire));
+        audio.addEventListener("play", draw); audio.addEventListener("pause", draw); document.addEventListener("visibilitychange", draw); draw();
+        document.addEventListener("keydown", (e) => {   // "k" plays/pauses
+            if (e.key.toLowerCase() !== "k" || e.ctrlKey || e.metaKey || e.altKey || /input|textarea|select/i.test(e.target.tagName)) return;
+            audio.paused ? audio.play().catch(() => {}) : audio.pause();
+        });
+        if ("mediaSession" in navigator) {   // media keys + lock screen
+            navigator.mediaSession.metadata = new MediaMetadata({ title: "moog city", artist: "slowed + reverb", album: "donidonka.info", artwork: [{ src: "assets/profile-rifle.png", sizes: "320x320", type: "image/png" }] });
+            [["play", () => audio.play()], ["pause", () => audio.pause()], ["seekto", (d) => { audio.currentTime = d.seekTime; }]].forEach(([a, f]) => { try { navigator.mediaSession.setActionHandler(a, f); } catch {} });
+        }
         const tag = () => { const t = document.title.replace(/^♪ /, ""); document.title = audio.paused ? t : "♪ " + t; };
         audio.addEventListener("play", tag); audio.addEventListener("pause", tag);
         setTimeout(() => { if (audio.paused && !sessionStorage.getItem("dd-music-toast")) { try { sessionStorage.setItem("dd-music-toast", "1"); } catch {} window.ddToast("music is paused", "your browser blocks autoplay with sound. press play on the player to start it."); } }, 2400);
@@ -66,6 +97,35 @@
             audio.muted = !audio.muted; setMute();
         });
     }
+
+    async function whatsNew() {
+        const link = document.querySelector('.main-nav a[href="updates.html"]'); if (!link) return;
+        const onPage = /updates\.html$/.test(location.pathname), key = "dd-seen-updates", seen = parseInt(store.get(key) || "0", 10);
+        let count = 0;
+        try { count = onPage ? document.querySelectorAll(".update-item").length : ((await (await fetch("updates.html")).text()).match(/class="update-item"/g) || []).length; } catch { return; }
+        if (onPage || !seen) { if (count) store.set(key, String(count)); return; }
+        link.classList.toggle("has-new", count > seen);
+    }
+
+    // lightbox extras (the viewer is built in script.js): click image to zoom, swipe to change image
+    let touchX = null;
+    document.addEventListener("click", (e) => {
+        const box = e.target.closest && e.target.closest(".image-lightbox"); if (!box) return;
+        if (e.target.matches("img")) box.classList.toggle("is-zoomed"); else if (e.target.matches(".lightbox-prev, .lightbox-next")) box.classList.remove("is-zoomed");
+    });
+    document.addEventListener("close", (e) => e.target.classList && e.target.classList.remove("is-zoomed"), true);
+    document.addEventListener("touchstart", (e) => { touchX = e.target.closest(".image-lightbox") ? e.touches[0].clientX : null; }, { passive: true });
+    document.addEventListener("touchend", (e) => {
+        if (touchX === null) return; const dx = e.changedTouches[0].clientX - touchX; touchX = null;
+        const box = document.querySelector(".image-lightbox[open]"); if (box && Math.abs(dx) > 50) box.querySelector(dx < 0 ? ".lightbox-next" : ".lightbox-prev").click();
+    }, { passive: true });
+
+    // pointer parallax: the watermark leans a few px away from the cursor (fine pointers only)
+    let ptTick = false;
+    if (matchMedia("(pointer: fine)").matches) window.addEventListener("pointermove", (e) => {
+        if (ptTick || prefersLess() || document.documentElement.classList.contains("user-reduced-motion")) return; ptTick = true;
+        requestAnimationFrame(() => { const r = document.documentElement.style; r.setProperty("--mx", ((e.clientX / innerWidth - .5) * -14).toFixed(1) + "px"); r.setProperty("--my", ((e.clientY / innerHeight - .5) * -14).toFixed(1) + "px"); ptTick = false; });
+    }, { passive: true });
 
     function page() {
         const main = document.querySelector("main");
@@ -92,6 +152,11 @@
             foot.appendChild(nav);
         }
         const tt = document.title.replace(/^♪ /, ""), au = document.getElementById("background-audio"); document.title = au && !au.paused ? "♪ " + tt : tt;
+        const av = document.querySelector(".avatar"), img = document.querySelector(".avatar-image");
+        if (av && img && !av.dataset.fx) { av.dataset.fx = "1"; av.addEventListener("click", () => { img.classList.remove("is-kick"); void img.offsetWidth; img.classList.add("is-kick"); }); }
+        const nf = document.querySelector(".not-found-links");
+        if (nf && !document.querySelector(".not-found-path")) { const c = document.createElement("p"); c.className = "not-found-path"; c.textContent = "you asked for: " + location.pathname; nf.before(c); }
+        whatsNew();
         // "/" jumps to project search
         const search = document.getElementById("project-search");
         if (search && !search.dataset.fx) { search.dataset.fx = "1";
@@ -174,7 +239,7 @@
     window.addEventListener("scroll", () => {
         if (wmTick || prefersLess() || document.documentElement.classList.contains("user-reduced-motion")) return;
         wmTick = true;
-        requestAnimationFrame(() => { document.documentElement.style.setProperty("--wm", Math.min(scrollY * 0.04, 36) + "px"); wmTick = false; });
+        requestAnimationFrame(() => { document.documentElement.style.setProperty("--wm", Math.min(scrollY * 0.04, 36) + "px"); document.documentElement.style.setProperty("--sy", scrollY + "px"); wmTick = false; });
     }, { passive: true });
 
     window.ddInitFx = () => { stars(); player(); page(); projectsAndReset(); repoInfo(); shareButton(); };
