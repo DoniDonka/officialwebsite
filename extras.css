@@ -121,3 +121,11 @@ html.user-reduced-motion .dd-glow, html.user-reduced-motion .avatar::after { ani
     body { background:#fff !important; color:#000 !important; } body::before { display:none !important; }
     * { color:#000 !important; border-color:#999 !important; box-shadow:none !important; }
 }
+
+/* projects: status line + sort. dashed border = no public repo to look at */
+.project-status { display:block; margin-top:14px; padding-top:10px; border-top:1px solid #1e1e1e; color:#858585; font-size:11px; letter-spacing:.02em; }
+.project-filter-card[data-state="public"] .project-status::before { content:"● "; color:#9a9a9a; }
+.project-filter-card[data-state="none"], .project-filter-card[data-state="private"] { border-style:dashed; }
+.project-filter-card[data-state="none"] .project-status::before, .project-filter-card[data-state="private"] .project-status::before { content:"○ "; }
+.project-sort { margin-left:auto; padding:7px 12px; border:1px solid #2a2a2a; background:transparent; color:#858585; font:inherit; font-size:12px; cursor:pointer; transition:border-color .2s, color .2s; }
+.project-sort:hover, .project-sort[aria-pressed="true"] { border-color:#777; color:#e5e5e5; }

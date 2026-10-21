@@ -105,6 +105,15 @@
     if (shell && pl && pl.parentElement !== shell) shell.appendChild(pl);
 
     function projectsAndReset() {
+        const grid = document.querySelector(".project-filter-grid"), sort = document.querySelector(".project-sort");
+        if (grid && sort && !sort.dataset.fx) {
+            sort.dataset.fx = "1"; Array.from(grid.children).forEach((c, i) => { c.dataset.i = i; });
+            sort.addEventListener("click", () => {
+                const az = sort.getAttribute("aria-pressed") !== "true";
+                sort.setAttribute("aria-pressed", String(az)); sort.textContent = "sort: " + (az ? "a–z" : "default");
+                Array.from(grid.children).sort((a, b) => az ? a.querySelector("h2").textContent.localeCompare(b.querySelector("h2").textContent) : a.dataset.i - b.dataset.i).forEach((c) => grid.appendChild(c));
+            });
+        }
         const buttons = Array.from(document.querySelectorAll("[data-project-filter]"));
         buttons.forEach((btn) => btn.addEventListener("click", () => {
             const v = btn.dataset.projectFilter; history.replaceState(history.state, "", v === "all" ? location.pathname : "#" + v);

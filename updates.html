@@ -34,6 +34,7 @@
 </nav></header><main>
 <section class="page-hero"><div class="page-label">/ UPDATES</div><h1>what changed.</h1><p>i'll put the bigger changes here when there's actually something to add.</p></section>
 <section class="page-content"><div class="update-list">
+<article class="update-item"><span class="update-date">OCT 20, 2026</span><h2>lighter music file + clearer project cards</h2><p>the song is about 60% smaller now (2.8 MB instead of 6.9 MB), and it only downloads when it actually starts playing. project cards say whether there is a public repo, and there is a sort button on the projects page.</p></article>
 <article class="update-item"><span class="update-date">OCT 20, 2026</span><h2>floating nav, toasts and more background</h2><p>the nav now floats at the top on desktop, there are small popups for things like blocked autoplay, a quick-copy box on the links page, twinkling stars, a slow glow, the odd shooting star, and ♪ in the tab title while music plays.</p></article>
 <article class="update-item"><span class="update-date">OCT 20, 2026</span><h2>music keeps playing between pages</h2><p>moving around the site no longer restarts the song. the player can also be minimised, muted with the m key, and remembers that.</p></article>
 <article class="update-item"><span class="update-date">OCT 20, 2026</span><h2>real profile picture</h2><p>swapped in my original pencil-rifle picture.</p></article>
@@ -42,7 +43,7 @@
 <article class="update-item"><span class="update-date">NEXT</span><h2>more stuff later</h2><p>i'll add real screenshots and keep building on this when i've got more stuff to show.</p></article>
 </div></section></main>
 <div class="music-player music-player-global" aria-label="background music player">
-<audio id="background-audio" preload="auto" autoplay loop><source src="assets/moog-city.mp3" type="audio/mpeg"></audio>
+<audio id="background-audio" preload="metadata" autoplay loop><source src="assets/moog-city-light.mp3" type="audio/mpeg"></audio>
 <button class="music-play-button" id="music-play-button" type="button" aria-label="play background music" aria-pressed="false"><span class="music-play-symbol" aria-hidden="true">▶</span></button>
 <div class="music-details"><p class="music-eyebrow">music</p><p class="music-title">moog city <span>· slowed + reverb</span></p><p class="music-status" id="music-status" aria-live="polite">tap play if your browser blocks autoplay</p><div class="music-timeline"><span class="music-time" id="music-current-time">0:00</span><input class="music-seek" id="music-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="seek through music"><span class="music-time" id="music-duration">0:00</span></div></div>
 <label class="music-volume-control"><span class="visually-hidden">music volume</span><span class="volume-symbol" aria-hidden="true">volume</span><input id="music-volume" type="range" min="0" max="100" value="30" aria-label="music volume"></label></div><footer class="site-footer"><span class="footer-line"></span><a href="index.html" class="footer-domain">DONIDONKA.INFO</a><span class="footer-line"></span><p class="footer-note">made by donidonka · <a href="updates.html">site updates</a></p></footer></div></body></html>
