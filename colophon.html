@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="extras.css">
 <script src="script.js" defer></script>
+<script src="config.js" defer></script>
 <script src="extras.js" defer></script>
 <script src="nav.js" defer></script>
 <link rel="icon" type="image/png" href="assets/profile-rifle.png">
@@ -19,13 +20,18 @@
 <meta property="og:description" content="how donidonka.info is made and what it stores.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://donidonka.info/colophon.html">
-<meta property="og:image" content="https://donidonka.info/assets/profile-rifle.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://donidonka.info/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#030405">
 <link rel="canonical" href="https://donidonka.info/colophon.html">
 <script>try{if(!sessionStorage.getItem('dd-intro')){document.documentElement.classList.add('dd-intro');sessionStorage.setItem('dd-intro','1');setTimeout(function(){document.documentElement.classList.remove('dd-intro')},2400)}}catch(e){}</script>
 <meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="alternate" type="application/atom+xml" title="donidonka.info updates" href="feed.xml">
 </head>
 <body><div class="site-shell">
 <header class="site-header">
@@ -42,8 +48,8 @@
 <div><dt>pictures</dt><dd>the pencil-rifle is my own picture. the big faint rifle behind every page is my line drawing.</dd></div>
 <div><dt>pages</dt><dd>when you click around, the page content gets swapped in with a little javascript instead of reloading, which is why the music doesn't restart.</dd></div></dl></div></section>
 <section class="page-content"><div class="about-panel"><p class="section-kicker">// what it keeps on your device</p>
-<p class="about-text">only in your browser's own storage, and none of it is sent anywhere: music volume, loop and player size, the contrast and motion switches, how many times you opened the home page, which changelog entries you've seen, which hidden things you found, and the numbers on the stats page.</p>
-<p class="about-text" style="margin-top:14px">the only outside requests are google fonts, and the projects page asking github's public api when a repo was last pushed.</p>
+<p class="about-text">only in your browser's own storage, and none of it is sent anywhere: music volume, loop and player size, the contrast and motion switches, how many times you opened the home page, which changelog entries you've seen, which hidden things you found, the numbers on the stats page, and your draft message plus the ids of tickets you've sent.</p>
+<p class="about-text" style="margin-top:14px">the outside requests are google fonts, the projects page asking github's public api when a repo was last pushed, and the contact form (only when you send a ticket) going through a form service that emails it to me.</p>
 <div class="lab-controls"><button type="button" data-action="clear-all">clear everything this site stored on my device</button></div></div></section>
 </main>
 <div class="music-player music-player-global" aria-label="background music player">

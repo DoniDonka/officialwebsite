@@ -235,3 +235,30 @@ kbd { display:inline-block; min-width:24px; padding:2px 7px; border:1px solid #3
 .dd-toast-link { display:block; margin-top:8px; color:#f0f0f0; font-size:12px; text-underline-offset:3px; }
 .secret-link { color:#9a9a9a !important; }
 @media (max-width: 640px) { .fact-list div, .key-list div { grid-template-columns:1fr; gap:4px; } }
+
+/* ---- batch 10: support tickets ---- */
+.ticket-panel { max-width:640px; }
+.field { display:grid; gap:6px; margin-top:18px; }
+.field label, .field-meta { color:#a8a8a8; font-size:12px; letter-spacing:.04em; }
+.field .opt { color:#666; }
+.field input, .field select, .field textarea { width:100%; padding:10px 12px; border:1px solid #2a2a2a; background:#050505; color:#e5e5e5; font:inherit; font-size:13px; border-radius:0; box-sizing:border-box; transition:border-color .2s; }
+.field textarea { resize:vertical; min-height:140px; line-height:1.6; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color:#8a8a8a; outline:none; }
+.field input[aria-invalid="true"], .field textarea[aria-invalid="true"] { border-color:#e5e5e5; }
+.field-meta { display:flex; justify-content:space-between; gap:12px; margin:0; color:#666; }
+.field-err { margin:0; }
+.field-err:empty { display:none; }
+.field-err:not(:empty) { padding-left:8px; border-left:2px solid #e5e5e5; color:#e5e5e5; font-size:12px; }
+.check { display:flex; align-items:flex-start; gap:10px; margin-top:18px; color:#a8a8a8; font-size:12px; line-height:1.6; cursor:pointer; }
+.check input { margin-top:3px; accent-color:#cfcfcf; }
+.field-from, .ticket-privacy, .ticket-note { margin:14px 0 0; color:#777; font-size:12px; line-height:1.7; }
+.field-from:empty { display:none; }
+.ticket-off { margin:14px 0 0; padding:12px 14px; border:1px dashed #3a3a3a; color:#bdbdbd; font-size:12px; line-height:1.7; }
+.ticket-status { min-height:1.4em; margin:12px 0 0; color:#d0d0d0; font-size:12px; }
+.hp { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+.lab-controls button:disabled { opacity:.4; cursor:not-allowed; border-color:#2a2a2a; color:#888; }
+#ticket-done:focus { outline:none; }
+.ticket-list { display:grid; gap:10px; margin:12px 0 0; padding:0; list-style:none; }
+.ticket-list li { display:flex; flex-wrap:wrap; gap:6px 14px; padding-bottom:10px; border-bottom:1px solid #1a1a1a; font-size:12px; }
+.ticket-list code { color:#e5e5e5; }
+.ticket-list span { color:#858585; }

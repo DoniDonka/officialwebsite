@@ -187,12 +187,17 @@
     function track() {
         store.set("dd-views", String((parseInt(store.get("dd-views") || "0", 10) || 0) + 1));
         if (!store.get("dd-first")) store.set("dd-first", new Date().toISOString().slice(0, 10));
+        if (!/contact\.html$/.test(location.pathname)) { try { sessionStorage.setItem("dd-last-real", location.pathname); } catch {} }
         try { if (!sessionStorage.getItem("dd-session-start")) sessionStorage.setItem("dd-session-start", String(Date.now())); } catch {}
     }
     function secretPages() {
         if (document.getElementById("lab-canvas")) {
             if (window.ddLabInit) window.ddLabInit();
             else if (!document.querySelector("script[data-lab]")) { const s = document.createElement("script"); s.src = "lab.js"; s.dataset.lab = "1"; s.onload = () => window.ddLabInit(); document.head.appendChild(s); }
+        }
+        if (document.getElementById("ticket-form")) {
+            if (window.ddTicketInit) window.ddTicketInit();
+            else if (!document.querySelector("script[data-ticket]")) { const s = document.createElement("script"); s.src = "ticket.js"; s.dataset.ticket = "1"; s.onload = () => window.ddTicketInit(); document.head.appendChild(s); }
         }
         const grid = document.querySelector(".stat-grid");
         if (grid && !grid.dataset.fx) {
@@ -236,8 +241,8 @@
         const foot = document.querySelector(".site-footer");
         if (foot && !foot.querySelector(".footer-links")) {
             const nav = document.createElement("nav"); nav.className = "footer-links"; nav.setAttribute("aria-label", "footer links");
-            [["github", "https://github.com/DoniDonka"], ["youtube", "https://www.youtube.com/@schoolinformer177"], ["roblox", "https://www.roblox.com/search/users?keyword=DoniDonka"], ["projects", "projects.html"], ["shortcuts", "keys.html"]].forEach(([t, h]) => {
-                const a = document.createElement("a"); a.textContent = t; a.href = h; if (h.startsWith("http")) { a.target = "_blank"; a.rel = "noopener noreferrer"; } nav.appendChild(a);
+            [["github", "https://github.com/DoniDonka"], ["youtube", "https://www.youtube.com/@schoolinformer177"], ["roblox", "https://www.roblox.com/search/users?keyword=DoniDonka"], ["projects", "projects.html"], ["shortcuts", "keys.html"], ["report a problem", "contact.html?topic=bug"], ["feed", "feed.xml"]].forEach(([t, h]) => {
+                const a = document.createElement("a"); a.textContent = t; a.href = h; if (h.startsWith("http") || h.endsWith(".xml")) { a.target = "_blank"; a.rel = "noopener noreferrer"; } nav.appendChild(a);
             });
             foot.appendChild(nav);
         }

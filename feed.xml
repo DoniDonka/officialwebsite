@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>donidonka.info updates</title>
+  <link href="https://donidonka.info/feed.xml" rel="self"/>
+  <link href="https://donidonka.info/updates.html"/>
+  <id>https://donidonka.info/</id>
+  <updated>2026-10-22T12:00:00Z</updated>
+  <author><name>DoniDonka</name></author>
+  <entry>
+    <title>support tickets</title>
+    <link href="https://donidonka.info/updates.html#support-tickets"/>
+    <id>https://donidonka.info/updates.html#support-tickets</id>
+    <updated>2026-10-22T12:00:00Z</updated>
+    <summary>the contact page has a ticket form now, with a draft that saves while you click around, an id for every ticket, and a report a problem link in the footer. it only starts working once i switch it on, and until then it says so instead of pretending. there is also a feed for these updates now, and the site can be added to a home screen.</summary>
+  </entry>
+  <entry>
+    <title>hidden pages</title>
+    <link href="https://donidonka.info/updates.html#hidden-pages"/>
+    <id>https://donidonka.info/updates.html#hidden-pages</id>
+    <updated>2026-10-21T12:00:00Z</updated>
+    <summary>there are a few hidden things on the site now. good luck finding them. there is also a shortcuts page, for the ones that aren&#x27;t hidden.</summary>
+  </entry>
+  <entry>
+    <title>more motion</title>
+    <link href="https://donidonka.info/updates.html#more-motion"/>
+    <id>https://donidonka.info/updates.html#more-motion</id>
+    <updated>2026-10-21T12:00:00Z</updated>
+    <summary>the hero drifts away as you scroll and the footer rises in, page titles wipe in, the first visit of a session has a short intro, buttons ripple, sorting projects slides the cards into place, the back-to-top button shows how far down you are, section headings have copy-link buttons, and each page links to the next and previous one.</summary>
+  </entry>
+  <entry>
+    <title>equalizer, depth and small details</title>
+    <link href="https://donidonka.info/updates.html#equalizer-depth-and-small-details"/>
+    <id>https://donidonka.info/updates.html#equalizer-depth-and-small-details</id>
+    <updated>2026-10-20T12:00:00Z</updated>
+    <summary>the player has a small equalizer that reacts to the actual music, press k to play or pause, and media keys work. the stars and watermark shift a little as you scroll and move the mouse, the avatar kicks when you click it, gallery images zoom and can be saved, and the updates link gets a dot when there is something new.</summary>
+  </entry>
+  <entry>
+    <title>lighter music file + clearer project cards</title>
+    <link href="https://donidonka.info/updates.html#lighter-music-file-clearer-project-cards"/>
+    <id>https://donidonka.info/updates.html#lighter-music-file-clearer-project-cards</id>
+    <updated>2026-10-20T12:00:00Z</updated>
+    <summary>the song is about 60% smaller now (2.8 MB instead of 6.9 MB), and it only downloads when it actually starts playing. project cards say whether there is a public repo, and there is a sort button on the projects page.</summary>
+  </entry>
+  <entry>
+    <title>floating nav, toasts and more background</title>
+    <link href="https://donidonka.info/updates.html#floating-nav-toasts-and-more-background"/>
+    <id>https://donidonka.info/updates.html#floating-nav-toasts-and-more-background</id>
+    <updated>2026-10-20T12:00:00Z</updated>
+    <summary>the nav now floats at the top on desktop, there are small popups for things like blocked autoplay, a quick-copy box on the links page, twinkling stars, a slow glow, the odd shooting star, and ♪ in the tab title while music plays.</summary>
+  </entry>
+  <entry>
+    <title>music keeps playing between pages</title>
+    <link href="https://donidonka.info/updates.html#music-keeps-playing-between-pages"/>
+    <id>https://donidonka.info/updates.html#music-keeps-playing-between-pages</id>
+    <updated>2026-10-20T12:00:00Z</updated>
+    <summary>moving around the site no longer restarts the song. the player can also be minimised, muted with the m key, and remembers that.</summary>
+  </entry>
+  <entry>
+    <title>real profile picture</title>
+    <link href="https://donidonka.info/updates.html#real-profile-picture"/>
+    <id>https://donidonka.info/updates.html#real-profile-picture</id>
+    <updated>2026-10-20T12:00:00Z</updated>
+    <summary>swapped in my original pencil-rifle picture.</summary>
+  </entry>
+</feed>

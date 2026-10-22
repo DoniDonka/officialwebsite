@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="extras.css">
 <script src="script.js" defer></script>
+<script src="config.js" defer></script>
 <script src="extras.js" defer></script>
 <script src="nav.js" defer></script>
 <link rel="icon" type="image/png" href="assets/profile-rifle.png">
@@ -19,12 +20,17 @@
 <meta property="og:description" content="how to reach donidonka.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://donidonka.info/contact.html">
-<meta property="og:image" content="https://donidonka.info/assets/profile-rifle.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://donidonka.info/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#030405">
 <link rel="canonical" href="https://donidonka.info/contact.html">
 <script>try{if(!sessionStorage.getItem('dd-intro')){document.documentElement.classList.add('dd-intro');sessionStorage.setItem('dd-intro','1');setTimeout(function(){document.documentElement.classList.remove('dd-intro')},2400)}}catch(e){}</script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="alternate" type="application/atom+xml" title="donidonka.info updates" href="feed.xml">
 </head>
 <body><div class="site-shell">
 <header class="site-header">
@@ -33,9 +39,25 @@
 <nav class="main-nav" id="main-navigation" aria-label="Main navigation">
 <a class="nav-link" href="index.html">home</a><a class="nav-link" href="projects.html">projects</a><a class="nav-link" href="links.html">links</a><a class="nav-link" href="about.html">about</a><a class="nav-link" href="gallery.html">gallery</a><a class="nav-link" href="updates.html">updates</a><a class="nav-link" href="contact.html">contact</a>
 </nav></header><main>
-<section class="page-hero"><div class="page-label">/ CONTACT</div><h1>got something to tell me?</h1><p>if you wanna ask me something about a project or the site, github is the easiest way to reach me.</p><a class="contact-link" href="https://github.com/DoniDonka" target="_blank" rel="noopener noreferrer">open my github <span>↗</span></a></section>
+<section class="page-hero"><div class="page-label">/ CONTACT</div><h1>got something to tell me?</h1><p>send me a ticket below, or find me on github. a bug on the site, a question about a project, or just saying hi all work.</p><a class="contact-link" href="https://github.com/DoniDonka" target="_blank" rel="noopener noreferrer">open my github <span>↗</span></a></section>
+<section class="page-content"><div class="about-panel ticket-panel"><p class="section-kicker">// send a ticket</p>
+<p class="ticket-off" id="ticket-off" hidden>this form isn't switched on yet, so it can't send anything. until it is, github is the way to reach me. you can still write your message and copy it.</p>
+<div id="ticket-done" tabindex="-1" hidden><p class="about-text">got it. your ticket id is <code id="done-id"></code>. it landed in my email. if you left a way to reply, that's how i'll answer.</p><div class="lab-controls"><button type="button" id="done-copy">copy ticket id</button><button type="button" id="done-again">send another</button></div></div>
+<form id="ticket-form" novalidate autocomplete="off">
+<div class="field"><label for="t-topic">what's it about</label><select id="t-topic" name="topic"><option value="bug">a bug on the site</option><option value="question">a question about a project</option><option value="idea">an idea, or something to work on together</option><option value="other">something else</option></select></div>
+<div class="field"><label for="t-subject">subject</label><input id="t-subject" name="subject" maxlength="80" required aria-describedby="err-subject"><p class="field-err" id="err-subject" role="alert"></p></div>
+<div class="field"><label for="t-message">message</label><textarea id="t-message" name="message" rows="7" maxlength="2000" required aria-describedby="err-message t-count"></textarea><p class="field-meta"><span id="t-count">0 / 2000</span><span id="t-draft"></span></p><p class="field-err" id="err-message" role="alert"></p></div>
+<div class="field"><label for="t-reply">how can i reply? <span class="opt">(optional)</span></label><input id="t-reply" name="reply" maxlength="120" placeholder="an email, or a discord / github name" aria-describedby="err-reply"><p class="field-err" id="err-reply" role="alert"></p></div>
+<label class="check"><input type="checkbox" name="include_tech" checked><span>include my browser and screen size, so i can reproduce bugs</span></label>
+<p class="field-from" id="ticket-from"></p>
+<div class="hp" aria-hidden="true"><label>leave this empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
+<p class="ticket-privacy">sending this passes your message through a form service that emails it to me. nothing else is collected.</p>
+<div class="lab-controls"><button type="submit" id="t-send">send ticket</button><button type="button" id="t-copy">copy my message instead</button></div>
+<p class="ticket-status" id="ticket-status" role="status" aria-live="polite"></p>
+</form></div></section>
+<section class="page-content" id="ticket-mine" hidden><div class="about-panel"><p class="section-kicker">// tickets you've sent from this browser</p><ul class="ticket-list" id="ticket-list"></ul><p class="ticket-note">i can't show replies here since the site has no inbox. replies go to whatever you put under "how can i reply".</p></div></section>
 <section class="page-content"><div class="page-label">/ COPY IT</div><div class="copy-stack"><div class="copy-box" data-copy="https://github.com/DoniDonka"><span class="copy-label">github</span><code>https://github.com/DoniDonka</code></div></div></section>
-<section class="page-content"><div class="about-panel"><p class="section-kicker">// quick note</p><p class="about-text">i haven't put an email on here, so just hit me up through github if you need to. my other links are <a href="links.html">here</a>.</p></div></section></main>
+<section class="page-content"><div class="about-panel"><p class="section-kicker">// quick note</p><p class="about-text">i don't show my email on here. tickets reach me by email anyway, and github works too. my other links are <a href="links.html">here</a>.</p></div></section></main>
 <div class="music-player music-player-global" aria-label="background music player">
 <audio id="background-audio" preload="metadata" autoplay loop><source src="assets/moog-city-light.mp3" type="audio/mpeg"></audio>
 <button class="music-play-button" id="music-play-button" type="button" aria-label="play background music" aria-pressed="false"><span class="music-play-symbol" aria-hidden="true">▶</span></button>
