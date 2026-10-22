@@ -5,11 +5,11 @@
     const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
                     set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
 
-    window.ddToast = (title, msg, ms = 4500) => {
+    window.ddToast = (title, msg, ms = 4500, href) => {
         let box = document.querySelector(".dd-toasts");
         if (!box) { box = document.createElement("div"); box.className = "dd-toasts"; box.setAttribute("role", "status"); box.setAttribute("aria-live", "polite"); document.body.appendChild(box); }
         const t = document.createElement("div"); t.className = "dd-toast"; t.innerHTML = "<strong></strong><span></span>";
-        t.style.setProperty("--dur", ms + "ms"); t.firstChild.textContent = title; t.lastChild.textContent = msg; box.appendChild(t);
+        t.style.setProperty("--dur", ms + "ms"); t.firstChild.textContent = title; t.lastChild.textContent = msg; if (href) { const a = document.createElement("a"); a.className = "dd-toast-link"; a.href = href; a.textContent = "open →"; t.appendChild(a); } box.appendChild(t);
         setTimeout(() => { t.classList.add("is-out"); setTimeout(() => t.remove(), 300); }, ms);
     };
     if (navigator.connection && navigator.connection.saveData) document.documentElement.classList.add("dd-lite");
@@ -65,7 +65,7 @@
         const draw = () => {
             cancelAnimationFrame(raf); g.clearRect(0, 0, 44, 18); if (an) an.getByteFrequencyData(bins);
             const live = an && !audio.paused && !prefersLess() && !document.documentElement.classList.contains("user-reduced-motion");
-            for (let i = 0; i < 8; i++) { const h = Math.max(2, (live ? bins[i + 1] / 255 : 0.1) * 18); g.fillStyle = "#bdbdbd"; g.fillRect(i * 5.5, 18 - h, 3, h); }
+            for (let i = 0; i < 8; i++) { const h = Math.max(2, (live ? bins[i * 3 + 1] / 255 : 0.1) * 18); g.fillStyle = "#bdbdbd"; g.fillRect(i * 5.5, 18 - h, 3, h); }
             if (live && !document.hidden) raf = requestAnimationFrame(draw);
         };
         const wire = async () => {
@@ -74,8 +74,8 @@
                 const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
                 const ac = new AC(); await ac.resume();
                 if (ac.state !== "running") { wired = false; ac.close(); return; }
-                const src = ac.createMediaElementSource(audio); an = ac.createAnalyser(); an.fftSize = 64; an.smoothingTimeConstant = 0.8;
-                src.connect(an); an.connect(ac.destination); bins = new Uint8Array(an.frequencyBinCount); cv.dataset.live = "1"; draw();
+                const src = ac.createMediaElementSource(audio); an = ac.createAnalyser(); an.fftSize = 256; an.smoothingTimeConstant = 0.8;
+                src.connect(an); an.connect(ac.destination); bins = new Uint8Array(an.frequencyBinCount); window.ddAnalyser = an; cv.dataset.live = "1"; draw();
             } catch { wired = false; }
         };
         ["click", "keydown", "touchend"].forEach((ev) => document.addEventListener(ev, wire));
@@ -90,6 +90,10 @@
         }
         const tag = () => { const t = document.title.replace(/^♪ /, ""); document.title = audio.paused ? t : "♪ " + t; };
         audio.addEventListener("play", tag); audio.addEventListener("pause", tag);
+        // listening time for the stats page (counted on this device only)
+        let lastT = null, acc = parseFloat(store.get("dd-listen") || "0"), lastSave = 0; window.ddListenSeconds = () => acc;
+        audio.addEventListener("timeupdate", () => { const t = audio.currentTime; if (lastT !== null) { const d = t - lastT; if (d > 0 && d < 1.5) acc += d; } lastT = t; if (Date.now() - lastSave > 5000) { lastSave = Date.now(); store.set("dd-listen", String(acc)); } });
+        audio.addEventListener("pause", () => { lastT = null; store.set("dd-listen", String(acc)); });
         setTimeout(() => { if (audio.paused && playBtn) playBtn.classList.add("is-attn"); }, 2400);
         audio.addEventListener("play", () => playBtn && playBtn.classList.remove("is-attn"));
         setTimeout(() => { if (audio.paused && !sessionStorage.getItem("dd-music-toast")) { try { sessionStorage.setItem("dd-music-toast", "1"); } catch {} window.ddToast("music is paused", "your browser blocks autoplay with sound. press play on the player to start it."); } }, 2400);
@@ -157,6 +161,62 @@
         main.appendChild(nav);
     }
 
+    // ---- hidden pages: how they're found, and what they need ----
+    const SECRETS = { lab: { name: "the lab", href: "lab.html" }, colophon: { name: "colophon", href: "colophon.html" }, stats: { name: "your stats", href: "stats.html" } };
+    const KONAMI = "ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a";
+    const found = () => { try { return JSON.parse(store.get("dd-secrets") || "[]"); } catch { return []; } };
+    const keyBuf = [], clicks = [];
+    window.ddOpen = (href) => { const a = document.createElement("a"); a.href = href; document.body.appendChild(a); a.click(); a.remove(); };
+    function renderSecretLinks() {
+        const nav = document.querySelector(".footer-links"); if (!nav) return;
+        nav.querySelectorAll(".secret-link").forEach((a) => a.remove());
+        found().forEach((id) => { const s = SECRETS[id]; if (!s) return; const a = document.createElement("a"); a.className = "secret-link"; a.href = s.href; a.textContent = s.name; nav.appendChild(a); });
+    }
+    function unlock(id) {
+        const s = SECRETS[id], list = found(); if (!s) return;
+        if (list.includes(id)) { window.ddOpen(s.href); return; }
+        list.push(id); store.set("dd-secrets", JSON.stringify(list)); renderSecretLinks();
+        window.ddToast("hidden page found: " + s.name, "it's in the footer now, so you can come back.", 7000, s.href);
+    }
+    document.addEventListener("keydown", (e) => {
+        if (e.ctrlKey || e.metaKey || e.altKey || /input|textarea|select/i.test(e.target.tagName)) return;
+        if (e.key === "?") { e.preventDefault(); window.ddOpen("keys.html"); return; }
+        keyBuf.push(e.key.length === 1 ? e.key.toLowerCase() : e.key); if (keyBuf.length > 12) keyBuf.shift();
+        if (keyBuf.join(",").endsWith(KONAMI)) unlock("lab"); else if (keyBuf.slice(-6).join("") === "pencil") unlock("colophon");
+    });
+    function track() {
+        store.set("dd-views", String((parseInt(store.get("dd-views") || "0", 10) || 0) + 1));
+        if (!store.get("dd-first")) store.set("dd-first", new Date().toISOString().slice(0, 10));
+        try { if (!sessionStorage.getItem("dd-session-start")) sessionStorage.setItem("dd-session-start", String(Date.now())); } catch {}
+    }
+    function secretPages() {
+        if (document.getElementById("lab-canvas")) {
+            if (window.ddLabInit) window.ddLabInit();
+            else if (!document.querySelector("script[data-lab]")) { const s = document.createElement("script"); s.src = "lab.js"; s.dataset.lab = "1"; s.onload = () => window.ddLabInit(); document.head.appendChild(s); }
+        }
+        const grid = document.querySelector(".stat-grid");
+        if (grid && !grid.dataset.fx) {
+            grid.dataset.fx = "1";
+            const cell = (k) => grid.querySelector(`[data-stat="${k}"]`), fmt = (s) => s < 60 ? Math.floor(s) + "s" : Math.floor(s / 60) + "m " + Math.floor(s % 60) + "s";
+            const countUp = (el, to) => { if (prefersLess() || !to) { el.textContent = String(to); return; } const t0 = performance.now(); const step = (t) => { const k = Math.min(1, (t - t0) / 700); el.textContent = String(Math.round(to * (1 - Math.pow(1 - k, 3)))); if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); };
+            countUp(cell("visits"), parseInt(store.get("donidonka-site-visits-v1") || "0", 10) || 0); countUp(cell("views"), parseInt(store.get("dd-views") || "0", 10) || 0);
+            cell("first").textContent = store.get("dd-first") || "–"; cell("secrets").textContent = found().length + " / " + Object.keys(SECRETS).length;
+            const live = () => { const st = parseInt(sessionStorage.getItem("dd-session-start") || "0", 10), ls = window.ddListenSeconds ? window.ddListenSeconds() : parseFloat(store.get("dd-listen") || "0");
+                cell("listen").textContent = fmt(ls); cell("session").textContent = st ? fmt((Date.now() - st) / 1000) : "–"; };
+            live(); const timer = setInterval(live, 1000); window.__ddCleanup.push(() => clearInterval(timer));
+            const reset = grid.parentElement.querySelector('[data-action="reset-stats"]');
+            if (reset) reset.addEventListener("click", () => { ["dd-views", "dd-first", "dd-listen", "donidonka-site-visits-v1"].forEach((k) => { try { localStorage.removeItem(k); } catch {} });
+                cell("visits").textContent = "0"; cell("views").textContent = "0"; cell("first").textContent = "–"; window.ddToast("stats reset", "counting starts again from now.", 3000); });
+        }
+        const clear = document.querySelector('[data-action="clear-all"]');
+        if (clear && !clear.dataset.fx) { clear.dataset.fx = "1"; clear.addEventListener("click", () => {
+            [localStorage, sessionStorage].forEach((st) => { try { Object.keys(st).filter((k) => /^(dd-|donidonka-)/.test(k)).forEach((k) => st.removeItem(k)); } catch {} });
+            document.documentElement.classList.remove("high-contrast", "user-reduced-motion");
+            const audio = document.getElementById("background-audio"), vol = document.getElementById("music-volume"); if (audio) { audio.volume = 0.3; audio.muted = false; } if (vol) vol.value = "30";
+            if (window.ddPlayerApi) { window.ddPlayerApi.setMini(innerHeight < 700); window.ddPlayerApi.setLoop(true); } renderSecretLinks();
+            window.ddToast("cleared", "everything this site stored on your device is gone.", 4000); }); }
+    }
+
     function page() {
         const main = document.querySelector("main");
         if (main && !main.id) main.id = "main";
@@ -176,14 +236,18 @@
         const foot = document.querySelector(".site-footer");
         if (foot && !foot.querySelector(".footer-links")) {
             const nav = document.createElement("nav"); nav.className = "footer-links"; nav.setAttribute("aria-label", "footer links");
-            [["github", "https://github.com/DoniDonka"], ["youtube", "https://www.youtube.com/@schoolinformer177"], ["roblox", "https://www.roblox.com/search/users?keyword=DoniDonka"], ["projects", "projects.html"]].forEach(([t, h]) => {
+            [["github", "https://github.com/DoniDonka"], ["youtube", "https://www.youtube.com/@schoolinformer177"], ["roblox", "https://www.roblox.com/search/users?keyword=DoniDonka"], ["projects", "projects.html"], ["shortcuts", "keys.html"]].forEach(([t, h]) => {
                 const a = document.createElement("a"); a.textContent = t; a.href = h; if (h.startsWith("http")) { a.target = "_blank"; a.rel = "noopener noreferrer"; } nav.appendChild(a);
             });
             foot.appendChild(nav);
         }
+        renderSecretLinks();
         const tt = document.title.replace(/^♪ /, ""), au = document.getElementById("background-audio"); document.title = au && !au.paused ? "♪ " + tt : tt;
         const av = document.querySelector(".avatar"), img = document.querySelector(".avatar-image");
-        if (av && img && !av.dataset.fx) { av.dataset.fx = "1"; av.addEventListener("click", () => { img.classList.remove("is-kick"); void img.offsetWidth; img.classList.add("is-kick"); }); }
+        if (av && img && !av.dataset.fx) { av.dataset.fx = "1"; av.addEventListener("click", () => {
+            img.classList.remove("is-kick"); void img.offsetWidth; img.classList.add("is-kick");
+            const now = Date.now(); clicks.push(now); while (clicks.length && now - clicks[0] > 4000) clicks.shift(); if (clicks.length >= 7) { clicks.length = 0; unlock("stats"); }
+        }); }
         const nf = document.querySelector(".not-found-links");
         if (nf && !document.querySelector(".not-found-path")) { const c = document.createElement("p"); c.className = "not-found-path"; c.textContent = "you asked for: " + location.pathname; nf.before(c); }
         whatsNew();
@@ -277,6 +341,6 @@
         requestAnimationFrame(() => { document.documentElement.style.setProperty("--wm", Math.min(scrollY * 0.04, 36) + "px"); document.documentElement.style.setProperty("--sy", scrollY + "px"); document.documentElement.style.setProperty("--prog", Math.min(100, Math.max(0, scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight) * 100)).toFixed(1)); wmTick = false; });
     }, { passive: true });
 
-    window.ddInitFx = () => { stars(); player(); page(); projectsAndReset(); repoInfo(); shareButton(); anchorsAndPager(); };
+    window.ddInitFx = () => { track(); stars(); player(); page(); secretPages(); projectsAndReset(); repoInfo(); shareButton(); anchorsAndPager(); };
     window.ddReady(window.ddInitFx);
 })();
