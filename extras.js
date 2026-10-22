@@ -9,7 +9,7 @@
         let box = document.querySelector(".dd-toasts");
         if (!box) { box = document.createElement("div"); box.className = "dd-toasts"; box.setAttribute("role", "status"); box.setAttribute("aria-live", "polite"); document.body.appendChild(box); }
         const t = document.createElement("div"); t.className = "dd-toast"; t.innerHTML = "<strong></strong><span></span>";
-        t.firstChild.textContent = title; t.lastChild.textContent = msg; box.appendChild(t);
+        t.style.setProperty("--dur", ms + "ms"); t.firstChild.textContent = title; t.lastChild.textContent = msg; box.appendChild(t);
         setTimeout(() => { t.classList.add("is-out"); setTimeout(() => t.remove(), 300); }, ms);
     };
     if (navigator.connection && navigator.connection.saveData) document.documentElement.classList.add("dd-lite");
@@ -90,6 +90,8 @@
         }
         const tag = () => { const t = document.title.replace(/^♪ /, ""); document.title = audio.paused ? t : "♪ " + t; };
         audio.addEventListener("play", tag); audio.addEventListener("pause", tag);
+        setTimeout(() => { if (audio.paused && playBtn) playBtn.classList.add("is-attn"); }, 2400);
+        audio.addEventListener("play", () => playBtn && playBtn.classList.remove("is-attn"));
         setTimeout(() => { if (audio.paused && !sessionStorage.getItem("dd-music-toast")) { try { sessionStorage.setItem("dd-music-toast", "1"); } catch {} window.ddToast("music is paused", "your browser blocks autoplay with sound. press play on the player to start it."); } }, 2400);
         audio.addEventListener("error", () => { const s = document.getElementById("music-status"); if (s) { s.textContent = "couldn't load the music file"; s.classList.add("music-error"); } });
         document.addEventListener("keydown", (e) => {   // "m" mutes, unless you're typing
@@ -126,6 +128,34 @@
         if (ptTick || prefersLess() || document.documentElement.classList.contains("user-reduced-motion")) return; ptTick = true;
         requestAnimationFrame(() => { const r = document.documentElement.style; r.setProperty("--mx", ((e.clientX / innerWidth - .5) * -14).toFixed(1) + "px"); r.setProperty("--my", ((e.clientY / innerHeight - .5) * -14).toFixed(1) + "px"); ptTick = false; });
     }, { passive: true });
+
+    document.addEventListener("pointerdown", (e) => {
+        const host = e.target.closest && e.target.closest(".primary-action, .secondary-action, .project-filter, .project-sort, .copy-btn");
+        if (!host || prefersLess() || document.documentElement.classList.contains("user-reduced-motion")) return;
+        host.classList.add("dd-ripple-host");
+        const r = host.getBoundingClientRect(), d = Math.max(r.width, r.height) * 2, s = document.createElement("span");
+        s.className = "dd-ripple"; s.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - r.left - d / 2}px;top:${e.clientY - r.top - d / 2}px`;
+        host.appendChild(s); setTimeout(() => s.remove(), 600);
+    });
+
+    function anchorsAndPager() {
+        const used = new Set(Array.from(document.querySelectorAll("[id]")).map((n) => n.id));
+        document.querySelectorAll("main h2").forEach((h) => {
+            if (h.closest("a") || h.querySelector(".anchor-btn")) return;
+            if (!h.id) { let base = h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "section", id = base, n = 2; while (used.has(id)) id = base + "-" + n++; h.id = id; used.add(id); }
+            const b = document.createElement("button"); b.type = "button"; b.className = "anchor-btn"; b.textContent = "#"; b.setAttribute("aria-label", "copy link to this section");
+            b.addEventListener("click", async () => { const url = location.origin + location.pathname + "#" + h.id;
+                try { await navigator.clipboard.writeText(url); window.ddToast("link copied", url, 2500); } catch { window.ddToast("couldn't copy", "your browser blocked it.", 3000); } });
+            h.appendChild(b);
+        });
+        const main = document.querySelector("main"), links = Array.from(document.querySelectorAll(".main-nav a")), here = links.findIndex((a) => new URL(a.href).pathname === location.pathname);
+        if (!main || here < 1 || main.querySelector(".page-pager")) return;   // skip the homepage and pages that aren't in the nav
+        const nav = document.createElement("nav"); nav.className = "page-pager"; nav.setAttribute("aria-label", "previous and next page");
+        const mk = (a, rel, arrow) => { const l = document.createElement("a"); l.href = a.getAttribute("href"); l.rel = rel; l.textContent = rel === "prev" ? "← " + a.textContent.trim() : a.textContent.trim() + " →"; return l; };
+        if (here > 0) nav.appendChild(mk(links[here - 1], "prev"));
+        if (here < links.length - 1) nav.appendChild(mk(links[here + 1], "next"));
+        main.appendChild(nav);
+    }
 
     function page() {
         const main = document.querySelector("main");
@@ -176,7 +206,12 @@
             sort.addEventListener("click", () => {
                 const az = sort.getAttribute("aria-pressed") !== "true";
                 sort.setAttribute("aria-pressed", String(az)); sort.textContent = "sort: " + (az ? "a–z" : "default");
-                Array.from(grid.children).sort((a, b) => az ? a.querySelector("h2").textContent.localeCompare(b.querySelector("h2").textContent) : a.dataset.i - b.dataset.i).forEach((c) => grid.appendChild(c));
+                const kids = Array.from(grid.children), before = new Map(kids.map((c) => [c, c.getBoundingClientRect()]));
+                kids.sort((a, b) => az ? a.querySelector("h2").textContent.localeCompare(b.querySelector("h2").textContent) : a.dataset.i - b.dataset.i).forEach((c) => grid.appendChild(c));
+                if (!prefersLess() && !document.documentElement.classList.contains("user-reduced-motion")) kids.forEach((c) => {
+                    const a = before.get(c), b = c.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top;
+                    if (dx || dy) c.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: "none" }], { duration: 380, easing: "cubic-bezier(.2,.7,.2,1)" });
+                });
             });
         }
         const buttons = Array.from(document.querySelectorAll("[data-project-filter]"));
@@ -239,9 +274,9 @@
     window.addEventListener("scroll", () => {
         if (wmTick || prefersLess() || document.documentElement.classList.contains("user-reduced-motion")) return;
         wmTick = true;
-        requestAnimationFrame(() => { document.documentElement.style.setProperty("--wm", Math.min(scrollY * 0.04, 36) + "px"); document.documentElement.style.setProperty("--sy", scrollY + "px"); wmTick = false; });
+        requestAnimationFrame(() => { document.documentElement.style.setProperty("--wm", Math.min(scrollY * 0.04, 36) + "px"); document.documentElement.style.setProperty("--sy", scrollY + "px"); document.documentElement.style.setProperty("--prog", Math.min(100, Math.max(0, scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight) * 100)).toFixed(1)); wmTick = false; });
     }, { passive: true });
 
-    window.ddInitFx = () => { stars(); player(); page(); projectsAndReset(); repoInfo(); shareButton(); };
+    window.ddInitFx = () => { stars(); player(); page(); projectsAndReset(); repoInfo(); shareButton(); anchorsAndPager(); };
     window.ddReady(window.ddInitFx);
 })();

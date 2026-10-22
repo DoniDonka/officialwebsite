@@ -148,3 +148,68 @@ html.user-reduced-motion .dd-glow, html.user-reduced-motion .avatar::after { ani
 .dd-lite .dd-glow, .dd-lite .dd-stars i:nth-of-type(2), .dd-lite .avatar::after { display:none; }
 .not-found-path { margin-top:14px; color:#858585; font-size:12px; word-break:break-all; }
 @media (prefers-reduced-motion: reduce) { .avatar-image.is-kick, .main-nav a.has-new::after { animation:none; } body::before { transition:none; } }
+
+/* ---- batch 8: scroll + motion ---- */
+/* scroll-driven (chromium): hero drifts up and fades as you leave it, footer rises as it arrives */
+@supports (animation-timeline: scroll()) {
+    .profile { animation:dd-hero-out linear both; animation-timeline:scroll(root); animation-range:0 70vh; }
+    .site-footer { animation:dd-foot-in linear both; animation-timeline:view(); animation-range:entry 0% entry 70%; }
+}
+@keyframes dd-hero-out { to { opacity:.15; transform:translateY(-36px) scale(.97); } }
+@keyframes dd-foot-in { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
+
+/* page titles wipe in */
+.page-hero h1 { animation:dd-wipe .8s .1s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes dd-wipe { from { clip-path:inset(0 100% 0 0); opacity:.3; } to { clip-path:inset(0 0 0 0); opacity:1; } }
+
+/* first visit of a session: header drops in, hero stacks up */
+html.dd-intro .site-header { animation:dd-drop .7s cubic-bezier(.2,.7,.2,1) both; }
+html.dd-intro .profile > *, html.dd-intro .page-hero > * { animation:dd-rise .8s cubic-bezier(.2,.7,.2,1) both; }
+html.dd-intro .profile > :nth-child(1), html.dd-intro .page-hero > :nth-child(1) { animation-delay:.12s; }
+html.dd-intro .profile > :nth-child(2), html.dd-intro .page-hero > :nth-child(2) { animation-delay:.22s; }
+html.dd-intro .profile > :nth-child(3), html.dd-intro .page-hero > :nth-child(3) { animation-delay:.32s; }
+html.dd-intro .profile > :nth-child(4), html.dd-intro .page-hero > :nth-child(4) { animation-delay:.42s; }
+html.dd-intro .profile > :nth-child(5), html.dd-intro .page-hero > :nth-child(5) { animation-delay:.52s; }
+html.dd-intro .profile > :nth-child(n+6), html.dd-intro .page-hero > :nth-child(n+6) { animation-delay:.62s; }
+@keyframes dd-drop { from { opacity:0; transform:translateY(-16px); } }
+@keyframes dd-rise { from { opacity:0; transform:translateY(18px); } }
+
+/* back-to-top shows how far down the page you are */
+.back-to-top::after { content:""; position:absolute; left:0; bottom:0; height:2px; width:calc(var(--prog, 0) * 1%); background:#bdbdbd; }
+
+/* ripples, toast timer, attention pulse on play */
+.dd-ripple-host { position:relative; overflow:hidden; }
+.dd-ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,.18); transform:scale(0); animation:dd-rip .55s ease-out forwards; pointer-events:none; }
+@keyframes dd-rip { to { transform:scale(1); opacity:0; } }
+.dd-toast { position:relative; overflow:hidden; }
+.dd-toast::after { content:""; position:absolute; left:0; bottom:0; height:2px; width:100%; background:#555; transform-origin:left; animation:dd-timer var(--dur, 4500ms) linear forwards; }
+@keyframes dd-timer { to { transform:scaleX(0); } }
+.is-attn { animation:dd-attn 1.8s ease-out infinite; }
+@keyframes dd-attn { 0% { box-shadow:0 0 0 0 rgba(255,255,255,.28); } 100% { box-shadow:0 0 0 12px rgba(255,255,255,0); } }
+
+/* gallery, lightbox, filters, anchors */
+.gallery-image img { transition:transform .5s ease; }
+.gallery-image:hover img { transform:scale(1.05); }
+.image-lightbox[open] { animation:dd-pop .22s ease; }
+.image-lightbox::backdrop { background:rgba(0,0,0,.82); animation:dd-fade .22s ease; }
+@keyframes dd-pop { from { opacity:0; transform:scale(.96); } }
+@keyframes dd-fade { from { opacity:0; } }
+.project-filter-card { animation:dd-pop .3s ease; }
+main [id] { scroll-margin-top:96px; }
+main :target { animation:dd-flash 1.4s ease; }
+@keyframes dd-flash { 0%, 30% { background:rgba(255,255,255,.07); } 100% { background:transparent; } }
+.anchor-btn { margin-left:10px; padding:0 4px; border:0; background:none; color:#666; font:inherit; opacity:0; cursor:pointer; transition:opacity .2s, color .2s; }
+h2:hover .anchor-btn, .anchor-btn:focus-visible { opacity:1; } .anchor-btn:hover { color:#e5e5e5; }
+@media (hover: none) { .anchor-btn { opacity:.45; } }
+
+/* previous / next page */
+.page-pager { display:flex; justify-content:space-between; gap:16px; max-width:900px; margin:56px auto 0; padding-top:20px; border-top:1px solid #1e1e1e; font-size:13px; }
+.page-pager a { color:#858585; text-decoration:none; transition:color .2s, transform .2s; }
+.page-pager a:hover { color:#e5e5e5; } .page-pager a[rel="prev"]:hover { transform:translateX(-3px); } .page-pager a[rel="next"]:hover { transform:translateX(3px); }
+.page-pager a:only-child[rel="next"] { margin-left:auto; }
+
+@media (prefers-reduced-motion: reduce) {
+    .profile, .site-footer, .page-hero h1, .project-filter-card, .image-lightbox[open], .is-attn, main :target { animation:none !important; }
+    html.dd-intro .site-header, html.dd-intro .profile > *, html.dd-intro .page-hero > * { animation:none !important; }
+    .gallery-image img, .gallery-image:hover img { transition:none; transform:none; }
+}
