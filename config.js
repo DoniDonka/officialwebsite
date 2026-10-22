@@ -8,5 +8,5 @@
    using formspree instead? set ticketEndpoint to your formspree url (https://formspree.io/f/xxxx) and make ticketFields empty: {} */
 window.DD_CONFIG = {
     ticketEndpoint: "https://api.web3forms.com/submit",
-    ticketFields: { access_key: "" }
+    ticketFields: { access_key: "4595e5e8-2fdb-4b9f-a4ba-a647770fe688" }
 };
