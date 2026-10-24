@@ -324,9 +324,9 @@
     if (log.length >= 5) { say("that's five tickets today already. try again tomorrow."); return; }
     const id = mkId(), fd = new FormData(); fd.append("access_key", key);
     fd.append("subject", "[" + id + "] " + TOPICS[topic()] + (f.priority.value === "urgent" ? " (URGENT)" : "") + ": " + val("subject_line"));
-    fd.append("from_name", "donidonka.info tickets"); fd.append("message", val("message"));
+    fd.append("from_name", "donidonka.info tickets"); fd.append("message", asText(id));
     if (via() === "email") fd.append("email", val("reply_to"));
-    entries(id).forEach(([k, v]) => fd.append(k, v));
+    entries(id).forEach(([k, v]) => fd.append(k.replace(/ /g, "_"), v));   // clean keys like ticket_id, so email templates can use {field:ticket_id}
     const btn = $("ddf-send"); btn.disabled = true; btn.textContent = "sending…"; say("sending…");
     const ctrl = new AbortController(), to = setTimeout(() => ctrl.abort(), 15000);
     try {

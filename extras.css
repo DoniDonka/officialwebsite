@@ -327,3 +327,19 @@ html[data-accent] .secret-link { color:var(--dd-accent-text) !important; }
 .pad-size { display:flex; align-items:center; gap:8px; color:#858585; font-size:12px; } .pad-size input { width:110px; accent-color:#bbb; }
 .pad-colors { display:flex; gap:6px; } .pad-colors button { width:26px; height:26px; padding:0; border:1px solid #3a3a3a; background:var(--c); cursor:pointer; }
 .pad-colors button[aria-pressed="true"] { outline:2px solid #e5e5e5; outline-offset:2px; }
+
+/* ---- advanced mode on the contact form ---- */
+.ticket-panel [hidden] { display:none !important; }
+.adv-toggle { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin:0 0 4px; }
+.adv-toggle button { padding:8px 14px; border:1px solid #2a2a2a; background:transparent; color:#bbb; font:inherit; font-size:12px; cursor:pointer; transition:border-color .2s, color .2s; }
+.adv-toggle button:hover, .adv-toggle button[aria-pressed="true"] { border-color:var(--dd-accent-text, #888); color:#fff; }
+.adv-toggle span { color:#777; font-size:12px; line-height:1.6; } .adv-toggle a { color:#e5e5e5; text-underline-offset:3px; }
+.adv-box { margin-top:6px; padding:4px 0 4px 16px; border-left:2px solid #333; animation:dd-in .3s ease; }
+html[data-accent] .adv-box { border-left-color:var(--dd-accent); }
+.adv-title { margin:14px 0 0; color:#858585; font-size:11px; letter-spacing:.14em; }
+.field-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:0 16px; }
+.adv-group:not([hidden]) { animation:dd-in .3s ease; }
+.adv-preview { margin-top:18px; border:1px solid #222; background:#060606; }
+.adv-preview summary { padding:10px 14px; color:#a8a8a8; font-size:12px; cursor:pointer; }
+.adv-preview pre { margin:0; padding:2px 14px 14px; color:#a8a8a8; font:inherit; font-size:12px; white-space:pre-wrap; word-break:break-word; max-height:240px; overflow:auto; }
+@media (prefers-reduced-motion: reduce) { .adv-box, .adv-group { animation:none !important; } }

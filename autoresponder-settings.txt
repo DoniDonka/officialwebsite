@@ -1,0 +1,30 @@
+AUTORESPONDER SETTINGS FOR WEB3FORMS  (the reply visitors get after sending a ticket)
+=====================================================================================
+important, from web3forms' own docs:
+  - the autoresponder is a PAID (pro) feature.
+  - it can only change 5 things (below). you can NOT give it your own html, so it can't be fully
+    themed. the purple look is only possible in the email that comes to YOU (notification.html).
+  - it only sends if the ticket has an "email" field. my forms add that field only when the visitor
+    chose "email" as where to reply (or typed an email in the simple form).
+  - it only works on the live site (donidonka.info), not on localhost.
+
+where: app.web3forms.com -> your form -> settings -> autoresponder
+
+1) From Name
+   DoniDonka
+
+2) Autoresponder Subject
+   got your ticket {field:ticket_id}
+
+3) Autoresponder Intro Text
+   thanks for writing in. this is just to say your ticket got to me. your ticket id is {field:ticket_id}, so keep it if you need to mention it later. i read these myself, and i'll answer the way you asked me to.
+
+4) Show a copy of their submission in the email
+   Yes
+
+5) Logo image (full https:// address, png)
+   https://donidonka.info/assets/icon-512.png
+   (this one is a rifle on a dark square, so it looks right on any email background. the transparent avatar would disappear on white.)
+
+note on the wording: it doesn't promise how fast i'll answer, on purpose. add that yourself if you want to make that promise.
+the {field:ticket_id} bits use web3forms' merge-tag format from their changelog. if your dashboard shows a different format for variables, use that one instead.
