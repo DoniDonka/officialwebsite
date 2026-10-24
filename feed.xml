@@ -7,6 +7,13 @@
   <updated>2026-10-22T12:00:00Z</updated>
   <author><name>DoniDonka</name></author>
   <entry>
+    <title>more pages, more settings</title>
+    <link href="https://donidonka.info/updates.html#more-pages-more-settings"/>
+    <id>https://donidonka.info/updates.html#more-pages-more-settings</id>
+    <updated>2026-10-22T12:00:00Z</updated>
+    <summary>new pages: a faq, a privacy page, a stack page that counts the tools my projects use, a brand page with the colours and files, a page that lists every page, and a longer ticket form. at the bottom of every page there are now accent and text size buttons, plus a view source link. the stats page shows the pages you opened this visit, and there is another hidden page.</summary>
+  </entry>
+  <entry>
     <title>support tickets</title>
     <link href="https://donidonka.info/updates.html#support-tickets"/>
     <id>https://donidonka.info/updates.html#support-tickets</id>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>faq — donidonka</title>
+<meta name="description" content="common questions about donidonka.info: music, privacy, colours, bugs and more.">
+<meta name="theme-color" content="#030405">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="extras.css">
+<script src="script.js" defer></script>
+<script src="config.js" defer></script>
+<script src="extras.js" defer></script>
+<script src="nav.js" defer></script>
+<link rel="icon" type="image/png" href="assets/profile-rifle.png">
+<meta property="og:title" content="faq — donidonka">
+<meta property="og:description" content="common questions about donidonka.info: music, privacy, colours, bugs and more.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://donidonka.info/faq.html">
+<meta property="og:image" content="https://donidonka.info/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#030405">
+<link rel="canonical" href="https://donidonka.info/faq.html">
+<script>try{if(!sessionStorage.getItem('dd-intro')){document.documentElement.classList.add('dd-intro');sessionStorage.setItem('dd-intro','1');setTimeout(function(){document.documentElement.classList.remove('dd-intro')},2400)}}catch(e){}</script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="alternate" type="application/atom+xml" title="donidonka.info updates" href="feed.xml">
+<script>try{var a=localStorage.getItem('dd-accent');if(a)document.documentElement.dataset.accent=a;var z=localStorage.getItem('dd-text');if(z)document.documentElement.style.setProperty('--dd-zoom',z)}catch(e){}</script>
+</head>
+<body><div class="site-shell">
+<header class="site-header">
+<a class="brand" href="index.html" aria-label="DoniDonka home"><span class="brand-mark">D/</span><span class="brand-name">DONIDONKA<span class="brand-cursor">_</span></span></a>
+<button class="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">menu <span aria-hidden="true">＋</span></button>
+<nav class="main-nav" id="main-navigation" aria-label="Main navigation">
+<a class="nav-link" href="index.html">home</a><a class="nav-link" href="projects.html">projects</a><a class="nav-link" href="links.html">links</a><a class="nav-link" href="about.html">about</a><a class="nav-link" href="gallery.html">gallery</a><a class="nav-link" href="updates.html">updates</a><a class="nav-link" href="contact.html">contact</a>
+</nav></header><main>
+<section class="page-hero"><div class="page-label">/ FAQ</div><h1>questions people might have.</h1><p>things people ask about the site. type in the box to filter them.</p></section>
+<section class="page-content"><div class="faq-tools"><input id="faq-search" type="search" placeholder="search the questions" aria-label="search the questions" autocomplete="off"><button type="button" id="faq-all" aria-pressed="false">open all</button><span id="faq-count" aria-live="polite"></span></div><div class="faq-list" id="faq-list"><details><summary>does the music restart when i click around?</summary><p>no. the pages swap in without a full reload, so the song keeps going. if you open a page in a new tab it does start fresh, because that's a brand new page.</p></details><details><summary>why doesn't the music start by itself?</summary><p>browsers block sound that starts without a click. press play on the player, or press k. after that it stays on across pages.</p></details><details><summary>does this site track me?</summary><p>no analytics, no ads, no cookies, no accounts. your settings live in your own browser. the <a href="privacy.html">privacy page</a> lists exactly what is stored and what leaves your device.</p></details><details><summary>how do i turn the animations off?</summary><p>use the motion button in the header. if your device is set to reduce motion, the site follows that on its own.</p></details><details><summary>how do i change the colours or the text size?</summary><p>at the bottom of any page there are two small buttons, accent and text. accent cycles gray, purple, ice and green. text cycles 100, 115 and 130 percent. both are remembered on your device.</p></details><details><summary>how do i report a bug?</summary><p>use "report a problem" in the footer, or the <a href="ticket.html">full ticket form</a> if you want to give more detail.</p></details><details><summary>where is the code?</summary><p>it's public on github: <a href="https://github.com/DoniDonka/officialwebsite" target="_blank" rel="noopener noreferrer">DoniDonka/officialwebsite</a>. every page also has a "view source" link at the bottom that goes straight to its file.</p></details><details><summary>can i use your picture or colours?</summary><p>the <a href="brand.html">brand page</a> has the files and the colours. if you're not sure whether you can use something, send me a ticket and ask.</p></details><details><summary>how do i get notified about updates?</summary><p>there's a feed (the "feed" link in the footer), and the updates link in the nav gets a small dot when something new is posted since your last visit.</p></details><details><summary>are there hidden pages?</summary><p>yes, a few. the changelog says so, and that's all i'm saying.</p></details></div><p class="faq-none" id="faq-none" hidden>nothing matches that. send me a <a href="contact.html">ticket</a> and i'll add it.</p></section>
+</main>
+<div class="music-player music-player-global" aria-label="background music player">
+<audio id="background-audio" preload="metadata" autoplay loop><source src="assets/moog-city-light.mp3" type="audio/mpeg"></audio>
+<button class="music-play-button" id="music-play-button" type="button" aria-label="play background music" aria-pressed="false"><span class="music-play-symbol" aria-hidden="true">▶</span></button>
+<div class="music-details"><p class="music-eyebrow">music</p><p class="music-title">moog city <span>· slowed + reverb</span></p><p class="music-status" id="music-status" aria-live="polite">tap play if your browser blocks autoplay</p><div class="music-timeline"><span class="music-time" id="music-current-time">0:00</span><input class="music-seek" id="music-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="seek through music"><span class="music-time" id="music-duration">0:00</span></div></div>
+<label class="music-volume-control"><span class="visually-hidden">music volume</span><span class="volume-symbol" aria-hidden="true">volume</span><input id="music-volume" type="range" min="0" max="100" value="30" aria-label="music volume"></label></div><footer class="site-footer"><span class="footer-line"></span><a href="index.html" class="footer-domain">DONIDONKA.INFO</a><span class="footer-line"></span><p class="footer-note">made by donidonka · <a href="updates.html">site updates</a></p></footer></div></body></html>

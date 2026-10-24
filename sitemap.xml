@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://donidonka.info/</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://donidonka.info/projects.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://donidonka.info/links.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://donidonka.info/about.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://donidonka.info/gallery.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://donidonka.info/updates.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://donidonka.info/contact.html</loc><lastmod>2026-10-20</lastmod></url>
+  <url><loc>https://donidonka.info/</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://donidonka.info/projects.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://donidonka.info/links.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://donidonka.info/about.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://donidonka.info/gallery.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://donidonka.info/updates.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://donidonka.info/contact.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://donidonka.info/faq.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://donidonka.info/privacy.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://donidonka.info/stack.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://donidonka.info/brand.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://donidonka.info/map.html</loc><lastmod>2026-10-22</lastmod></url>
 </urlset>

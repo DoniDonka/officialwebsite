@@ -31,6 +31,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
 <link rel="alternate" type="application/atom+xml" title="donidonka.info updates" href="feed.xml">
+<script>try{var a=localStorage.getItem('dd-accent');if(a)document.documentElement.dataset.accent=a;var z=localStorage.getItem('dd-text');if(z)document.documentElement.style.setProperty('--dd-zoom',z)}catch(e){}</script>
 </head>
 <body><div class="site-shell">
 <header class="site-header">
@@ -43,6 +44,7 @@
 <section class="page-content"><div class="about-panel ticket-panel"><p class="section-kicker">// send a ticket</p>
 <p class="ticket-off" id="ticket-off" hidden>this form isn't switched on yet, so it can't send anything. until it is, github is the way to reach me. you can still write your message and copy it.</p>
 <div id="ticket-done" tabindex="-1" hidden><p class="about-text">got it. your ticket id is <code id="done-id"></code>. it landed in my email. if you left a way to reply, that's how i'll answer.</p><div class="lab-controls"><button type="button" id="done-copy">copy ticket id</button><button type="button" id="done-again">send another</button></div></div>
+<p class="ticket-note" style="margin:0 0 4px">want to give more detail? there's a <a href="ticket.html">longer form</a> too.</p>
 <form id="ticket-form" novalidate autocomplete="off">
 <div class="field"><label for="t-topic">what's it about</label><select id="t-topic" name="topic"><option value="bug">a bug on the site</option><option value="question">a question about a project</option><option value="idea">an idea, or something to work on together</option><option value="other">something else</option></select></div>
 <div class="field"><label for="t-subject">subject</label><input id="t-subject" name="subject" maxlength="80" required aria-describedby="err-subject"><p class="field-err" id="err-subject" role="alert"></p></div>

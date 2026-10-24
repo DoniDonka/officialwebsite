@@ -65,7 +65,7 @@
         const draw = () => {
             cancelAnimationFrame(raf); g.clearRect(0, 0, 44, 18); if (an) an.getByteFrequencyData(bins);
             const live = an && !audio.paused && !prefersLess() && !document.documentElement.classList.contains("user-reduced-motion");
-            for (let i = 0; i < 8; i++) { const h = Math.max(2, (live ? bins[i * 3 + 1] / 255 : 0.1) * 18); g.fillStyle = "#bdbdbd"; g.fillRect(i * 5.5, 18 - h, 3, h); }
+            for (let i = 0; i < 8; i++) { const h = Math.max(2, (live ? bins[i * 3 + 1] / 255 : 0.1) * 18); g.fillStyle = window.ddEqColor || "#bdbdbd"; g.fillRect(i * 5.5, 18 - h, 3, h); }
             if (live && !document.hidden) raf = requestAnimationFrame(draw);
         };
         const wire = async () => {
@@ -162,7 +162,7 @@
     }
 
     // ---- hidden pages: how they're found, and what they need ----
-    const SECRETS = { lab: { name: "the lab", href: "lab.html" }, colophon: { name: "colophon", href: "colophon.html" }, stats: { name: "your stats", href: "stats.html" } };
+    const SECRETS = { lab: { name: "the lab", href: "lab.html" }, colophon: { name: "colophon", href: "colophon.html" }, stats: { name: "your stats", href: "stats.html" }, pad: { name: "the pad", href: "pad.html" } };
     const KONAMI = "ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a";
     const found = () => { try { return JSON.parse(store.get("dd-secrets") || "[]"); } catch { return []; } };
     const keyBuf = [], clicks = [];
@@ -182,9 +182,10 @@
         if (e.ctrlKey || e.metaKey || e.altKey || /input|textarea|select/i.test(e.target.tagName)) return;
         if (e.key === "?") { e.preventDefault(); window.ddOpen("keys.html"); return; }
         keyBuf.push(e.key.length === 1 ? e.key.toLowerCase() : e.key); if (keyBuf.length > 12) keyBuf.shift();
-        if (keyBuf.join(",").endsWith(KONAMI)) unlock("lab"); else if (keyBuf.slice(-6).join("") === "pencil") unlock("colophon");
+        if (keyBuf.join(",").endsWith(KONAMI)) unlock("lab"); else if (keyBuf.slice(-6).join("") === "pencil") unlock("colophon"); else if (keyBuf.slice(-6).join("") === "sketch") unlock("pad");
     });
     function track() {
+        try { const tr = JSON.parse(sessionStorage.getItem("dd-trail") || "[]"); tr.push(location.pathname); sessionStorage.setItem("dd-trail", JSON.stringify(tr.slice(-40))); } catch {}
         store.set("dd-views", String((parseInt(store.get("dd-views") || "0", 10) || 0) + 1));
         if (!store.get("dd-first")) store.set("dd-first", new Date().toISOString().slice(0, 10));
         if (!/contact\.html$/.test(location.pathname)) { try { sessionStorage.setItem("dd-last-real", location.pathname); } catch {} }
@@ -194,6 +195,10 @@
         if (document.getElementById("lab-canvas")) {
             if (window.ddLabInit) window.ddLabInit();
             else if (!document.querySelector("script[data-lab]")) { const s = document.createElement("script"); s.src = "lab.js"; s.dataset.lab = "1"; s.onload = () => window.ddLabInit(); document.head.appendChild(s); }
+        }
+        if (document.getElementById("pad-canvas")) {
+            if (window.ddPadInit) window.ddPadInit();
+            else if (!document.querySelector("script[data-pad]")) { const s = document.createElement("script"); s.src = "pad.js"; s.dataset.pad = "1"; s.onload = () => window.ddPadInit(); document.head.appendChild(s); }
         }
         if (document.getElementById("ticket-form")) {
             if (window.ddTicketInit) window.ddTicketInit();
@@ -209,6 +214,9 @@
             const live = () => { const st = parseInt(sessionStorage.getItem("dd-session-start") || "0", 10), ls = window.ddListenSeconds ? window.ddListenSeconds() : parseFloat(store.get("dd-listen") || "0");
                 cell("listen").textContent = fmt(ls); cell("session").textContent = st ? fmt((Date.now() - st) / 1000) : "–"; };
             live(); const timer = setInterval(live, 1000); window.__ddCleanup.push(() => clearInterval(timer));
+            const tr = document.getElementById("trail");
+            if (tr) { let seq = []; try { seq = JSON.parse(sessionStorage.getItem("dd-trail") || "[]"); } catch {} const counts = new Map(); seq.forEach((p) => counts.set(p, (counts.get(p) || 0) + 1));
+                tr.textContent = ""; counts.forEach((n, p) => { const li = document.createElement("li"), c = document.createElement("code"), s = document.createElement("span"); c.textContent = p === "/" || /index/.test(p) ? "home" : p.replace(/^\//, ""); s.textContent = "viewed " + n + (n > 1 ? " times" : " time"); li.append(c, s); tr.appendChild(li); }); }
             const reset = grid.parentElement.querySelector('[data-action="reset-stats"]');
             if (reset) reset.addEventListener("click", () => { ["dd-views", "dd-first", "dd-listen", "donidonka-site-visits-v1"].forEach((k) => { try { localStorage.removeItem(k); } catch {} });
                 cell("visits").textContent = "0"; cell("views").textContent = "0"; cell("first").textContent = "–"; window.ddToast("stats reset", "counting starts again from now.", 3000); });
@@ -218,9 +226,56 @@
             [localStorage, sessionStorage].forEach((st) => { try { Object.keys(st).filter((k) => /^(dd-|donidonka-)/.test(k)).forEach((k) => st.removeItem(k)); } catch {} });
             document.documentElement.classList.remove("high-contrast", "user-reduced-motion");
             const audio = document.getElementById("background-audio"), vol = document.getElementById("music-volume"); if (audio) { audio.volume = 0.3; audio.muted = false; } if (vol) vol.value = "30";
-            if (window.ddPlayerApi) { window.ddPlayerApi.setMini(innerHeight < 700); window.ddPlayerApi.setLoop(true); } renderSecretLinks();
+            if (window.ddPlayerApi) { window.ddPlayerApi.setMini(innerHeight < 700); window.ddPlayerApi.setLoop(true); } renderSecretLinks(); window.ddApplyLook && window.ddApplyLook();
             window.ddToast("cleared", "everything this site stored on your device is gone.", 4000); }); }
     }
+
+    // ---- accent colour, text size, footer extras ----
+    const ACCENTS = ["", "purple", "ice", "green"], TEXTS = ["1", "1.15", "1.3"];
+    window.ddApplyLook = () => {
+        const a = store.get("dd-accent") || "", z = store.get("dd-text") || "1", r = document.documentElement;
+        if (a) r.dataset.accent = a; else delete r.dataset.accent; r.style.setProperty("--dd-zoom", z);
+        window.ddEqColor = getComputedStyle(r).getPropertyValue("--dd-accent-text").trim();
+        const ab = document.querySelector("[data-look=accent]"), tb = document.querySelector("[data-look=text]");
+        if (ab) ab.textContent = "accent: " + (a || "gray"); if (tb) tb.textContent = "text: " + Math.round(z * 100) + "%";
+    };
+    function footerExtras() {
+        const foot = document.querySelector(".site-footer"); if (!foot) return;
+        if (!foot.querySelector(".footer-more")) {
+            const nav = document.createElement("nav"); nav.className = "footer-links footer-more"; nav.setAttribute("aria-label", "more pages");
+            const file = location.pathname.split("/").pop() || "index.html";
+            [["faq", "faq.html"], ["privacy", "privacy.html"], ["stack", "stack.html"], ["brand", "brand.html"], ["all pages", "map.html"], ["full ticket form", "ticket.html"], ["view source", "https://github.com/DoniDonka/officialwebsite/blob/main/" + file]].forEach(([t, h]) => {
+                const a = document.createElement("a"); a.textContent = t; a.href = h; if (h.startsWith("http")) { a.target = "_blank"; a.rel = "noopener noreferrer"; } nav.appendChild(a); });
+            foot.appendChild(nav);
+        }
+        if (!foot.querySelector(".footer-tools")) {
+            const box = document.createElement("div"); box.className = "footer-tools";
+            ["accent", "text"].forEach((k) => { const b = document.createElement("button"); b.type = "button"; b.className = "reset-settings"; b.dataset.look = k;
+                b.addEventListener("click", () => { const list = k === "accent" ? ACCENTS : TEXTS, key = k === "accent" ? "dd-accent" : "dd-text", cur = store.get(key) || list[0];
+                    const next = list[(list.indexOf(cur) + 1) % list.length]; if (next === list[0]) { try { localStorage.removeItem(key); } catch {} } else store.set(key, next); window.ddApplyLook(); }); box.appendChild(b); });
+            foot.appendChild(box);
+        }
+    }
+    function faqInit() {
+        const list = document.getElementById("faq-list"); if (!list || list.dataset.fx) return; list.dataset.fx = "1";
+        const items = Array.from(list.querySelectorAll("details")), search = document.getElementById("faq-search"), count = document.getElementById("faq-count"), none = document.getElementById("faq-none"), all = document.getElementById("faq-all");
+        search.addEventListener("input", () => { const q = search.value.trim().toLowerCase(); let n = 0; items.forEach((d) => { const hit = !q || d.textContent.toLowerCase().includes(q); d.hidden = !hit; if (hit) n++; }); count.textContent = q ? n + " of " + items.length : ""; none.hidden = n > 0; });
+        all.addEventListener("click", () => { const open = all.getAttribute("aria-pressed") !== "true"; all.setAttribute("aria-pressed", String(open)); all.textContent = open ? "close all" : "open all"; items.forEach((d) => { if (!d.hidden) d.open = open; }); });
+    }
+    async function stackInit() {
+        const chips = document.getElementById("stack-chips"), list = document.getElementById("stack-list"); if (!chips || chips.dataset.fx) return; chips.dataset.fx = "1";
+        try {
+            const r = await fetch("projects.html"); if (!r.ok) throw new Error("x");
+            const doc = new DOMParser().parseFromString(await r.text(), "text/html"), count = {}, rows = [];
+            doc.querySelectorAll(".project-filter-card").forEach((c) => { const name = c.querySelector("h2").textContent.replace("↗", "").trim(), tags = Array.from(c.querySelectorAll(".project-tags span")).map((s) => s.textContent.trim().toLowerCase()); tags.forEach((t) => { count[t] = (count[t] || 0) + 1; }); rows.push([name, tags]); });
+            chips.textContent = ""; Object.entries(count).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).forEach(([t, n]) => { const a = document.createElement("a"), s = document.createElement("small"); a.className = "stack-chip"; a.href = "projects.html?q=" + encodeURIComponent(t); a.textContent = t; s.textContent = n; a.append(s); chips.appendChild(a); });
+            list.textContent = ""; rows.forEach(([name, tags]) => { const d = document.createElement("div"), h = document.createElement("b"), p = document.createElement("span"); d.className = "stack-row"; h.textContent = name; p.textContent = tags.join(" · ") || "no tags yet"; d.append(h, p); list.appendChild(d); });
+        } catch { chips.textContent = "couldn't load the project list. open the projects page instead."; }
+    }
+    document.addEventListener("click", (e) => { const sw = e.target.closest && e.target.closest(".swatch"); if (!sw) return;
+        navigator.clipboard.writeText(sw.dataset.hex).then(() => window.ddToast("copied", sw.dataset.hex, 2200), () => window.ddToast("couldn't copy", "your browser blocked it.", 2500)); });
+    window.addEventListener("offline", () => window.ddToast("you're offline", "pages you've already opened keep working. sending a ticket won't.", 6000));
+    window.addEventListener("online", () => window.ddToast("back online", "", 2500));
 
     function page() {
         const main = document.querySelector("main");
@@ -287,6 +342,8 @@
         buttons.forEach((btn) => btn.addEventListener("click", () => {
             const v = btn.dataset.projectFilter; history.replaceState(history.state, "", v === "all" ? location.pathname : "#" + v);
         }));
+        const qs = new URLSearchParams(location.search).get("q"), si = document.getElementById("project-search");
+        if (qs && si && !si.dataset.q) { si.dataset.q = "1"; si.value = qs; si.dispatchEvent(new Event("input", { bubbles: true })); }
         const want = decodeURIComponent(location.hash.slice(1));
         const hit = buttons.find((btn) => btn.dataset.projectFilter === want && want !== "all");
         if (hit) hit.click();
@@ -295,14 +352,14 @@
         if (note && !note.querySelector(".reset-settings")) {
             const b = document.createElement("button"); b.type = "button"; b.className = "reset-settings"; b.textContent = "reset site settings";
             b.addEventListener("click", () => {
-                ["dd-high-contrast", "dd-reduce-motion", "dd-music-volume", "dd-player-mini", "dd-music-loop"].forEach((k) => { try { localStorage.removeItem(k); } catch {} });
+                ["dd-high-contrast", "dd-reduce-motion", "dd-music-volume", "dd-player-mini", "dd-music-loop", "dd-accent", "dd-text"].forEach((k) => { try { localStorage.removeItem(k); } catch {} });
                 try { sessionStorage.removeItem("donidonka-music-v1"); } catch {}
                 document.documentElement.classList.remove("high-contrast", "user-reduced-motion");
                 document.querySelectorAll("#contrast-toggle, #motion-toggle").forEach((t) => t.setAttribute("aria-pressed", "false"));
                 const audio = document.getElementById("background-audio"), vol = document.getElementById("music-volume");
                 if (audio) { audio.volume = 0.3; audio.muted = false; } if (vol) vol.value = "30";
                 if (window.ddPlayerApi) { window.ddPlayerApi.setMini(innerHeight < 700); window.ddPlayerApi.setLoop(true); }
-                b.textContent = "settings reset"; window.ddToast("settings reset", "contrast, motion, volume and loop are back to default.", 3000); setTimeout(() => { b.textContent = "reset site settings"; }, 2200);
+                window.ddApplyLook && window.ddApplyLook(); b.textContent = "settings reset"; window.ddToast("settings reset", "contrast, motion, volume and loop are back to default.", 3000); setTimeout(() => { b.textContent = "reset site settings"; }, 2200);
             });
             note.append(" · ", b);
         }
@@ -346,6 +403,6 @@
         requestAnimationFrame(() => { document.documentElement.style.setProperty("--wm", Math.min(scrollY * 0.04, 36) + "px"); document.documentElement.style.setProperty("--sy", scrollY + "px"); document.documentElement.style.setProperty("--prog", Math.min(100, Math.max(0, scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight) * 100)).toFixed(1)); wmTick = false; });
     }, { passive: true });
 
-    window.ddInitFx = () => { track(); stars(); player(); page(); secretPages(); projectsAndReset(); repoInfo(); shareButton(); anchorsAndPager(); };
+    window.ddInitFx = () => { track(); stars(); player(); page(); footerExtras(); faqInit(); stackInit(); window.ddApplyLook(); secretPages(); projectsAndReset(); repoInfo(); shareButton(); anchorsAndPager(); };
     window.ddReady(window.ddInitFx);
 })();

@@ -1,0 +1,302 @@
+<!-- ============================================================
+  DoniDonka ticket form  ·  paste this whole block anywhere in a page.
+  it's self-contained: its own styles (all start with .ddf), its own script, and it posts to web3forms.
+
+  KEY: the form looks for your web3forms access key in two places, in this order:
+    1) window.DD_CONFIG.ticketFields.access_key   (your site's config.js already sets this)
+    2) the ACCESS_KEY line near the top of the script below  (paste it there if you use this on another site)
+  until a key is found, the send button stays off and the form says so. it never pretends to send.
+
+  COLOURS: change --ddf-accent on the .ddf line in the style block. everything else follows it.
+============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+.ddf { --ddf-accent: rgb(144, 0, 144); --ddf-accent-hi: rgb(176, 28, 176); --ddf-accent-text: rgb(206, 120, 206);
+       --ddf-bg: #08060b; --ddf-panel: #0e0b13; --ddf-field: #0a0810; --ddf-line: #2b2234; --ddf-text: #ece8f1; --ddf-muted: #9d93a9;
+       --ddf-body: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; --ddf-head: "Space Mono", "JetBrains Mono", ui-monospace, monospace;
+       position:relative; box-sizing:border-box; max-width:760px; margin:0 auto; padding:34px clamp(18px,4vw,38px) 30px; color:var(--ddf-text); background:var(--ddf-bg);
+       border:1px solid var(--ddf-line); font:14px/1.7 var(--ddf-body); color-scheme:dark; overflow:hidden; }
+.ddf *, .ddf *::before, .ddf *::after { box-sizing:border-box; }
+.ddf [hidden] { display:none !important; }
+.ddf::before { content:""; position:absolute; inset:-40% -20% auto; height:320px; background:radial-gradient(50% 60% at 50% 0%, rgba(144,0,144,.22), transparent 70%); pointer-events:none; }
+.ddf > * { position:relative; }
+.ddf-bar { position:absolute; left:0; top:0; height:2px; width:100%; background:var(--ddf-line); }
+.ddf-bar i { display:block; height:100%; width:0; background:linear-gradient(90deg, var(--ddf-accent), var(--ddf-accent-hi)); box-shadow:0 0 12px var(--ddf-accent); transition:width .45s cubic-bezier(.2,.7,.2,1); }
+.ddf-kicker { margin:0 0 6px; color:var(--ddf-accent-text); font-size:12px; letter-spacing:.18em; text-transform:lowercase; }
+.ddf h2 { margin:0; font:700 clamp(26px,5vw,38px)/1.15 var(--ddf-head); letter-spacing:-.02em; }
+.ddf-lede { max-width:60ch; margin:12px 0 0; color:var(--ddf-muted); }
+.ddf-notice { margin:20px 0 0; padding:12px 14px; border:1px dashed var(--ddf-accent); color:var(--ddf-text); font-size:13px; }
+.ddf fieldset { margin:30px 0 0; padding:0; border:0; min-width:0; }
+.ddf legend { display:flex; align-items:baseline; gap:12px; width:100%; margin:0 0 4px; padding:0 0 10px; border-bottom:1px solid var(--ddf-line); font:700 15px var(--ddf-head); }
+.ddf legend span { color:var(--ddf-accent-text); font:400 12px var(--ddf-body); }
+.ddf-help { margin:8px 0 0; color:var(--ddf-muted); font-size:12px; }
+.ddf-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:0 18px; }
+.ddf-field { display:grid; gap:6px; margin-top:18px; }
+.ddf-field > label, .ddf-label { color:#cfc7d8; font-size:12px; letter-spacing:.05em; }
+.ddf-opt { color:#6f6679; }
+.ddf input[type=text], .ddf input[type=email], .ddf input[type=url], .ddf select, .ddf textarea { width:100%; padding:11px 13px; border:1px solid var(--ddf-line); border-radius:0; background:var(--ddf-field); color:var(--ddf-text); font:inherit; font-size:13px; transition:border-color .2s, box-shadow .2s, background .2s; }
+.ddf textarea { min-height:132px; resize:vertical; line-height:1.65; }
+.ddf select { appearance:none; background-image:linear-gradient(45deg,transparent 50%,var(--ddf-accent-text) 50%),linear-gradient(135deg,var(--ddf-accent-text) 50%,transparent 50%); background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%; background-size:5px 5px; background-repeat:no-repeat; padding-right:34px; }
+.ddf input:hover, .ddf select:hover, .ddf textarea:hover { border-color:#4a3b57; }
+.ddf input:focus-visible, .ddf select:focus-visible, .ddf textarea:focus-visible { outline:none; border-color:var(--ddf-accent-hi); box-shadow:0 0 0 3px rgba(144,0,144,.38); background:#0c0912; }
+.ddf [aria-invalid="true"] { border-color:var(--ddf-accent-text) !important; }
+.ddf-err { margin:0; padding-left:9px; border-left:2px solid var(--ddf-accent-text); color:#f0dcf0; font-size:12px; }
+.ddf-err:empty { display:none; }
+.ddf-meta { display:flex; justify-content:space-between; gap:12px; margin:0; color:#74697e; font-size:11px; }
+.ddf-pills { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.ddf-pills label, .ddf-cards label { position:relative; cursor:pointer; }
+.ddf-pills input, .ddf-cards input { position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; }
+.ddf-pills span { display:inline-block; padding:8px 14px; border:1px solid var(--ddf-line); background:var(--ddf-field); color:#bdb3c8; font-size:12px; transition:all .18s; }
+.ddf-pills label:hover span { border-color:#5d476d; color:#fff; }
+.ddf-pills input:checked + span { border-color:var(--ddf-accent-hi); background:rgba(144,0,144,.28); color:#fff; box-shadow:0 0 14px rgba(144,0,144,.35); }
+.ddf-pills input:focus-visible + span, .ddf-cards input:focus-visible + span { box-shadow:0 0 0 3px rgba(144,0,144,.5); }
+.ddf-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(98px,1fr)); gap:8px; margin-top:8px; }
+.ddf-cards span { display:grid; gap:2px; justify-items:start; height:100%; padding:11px 12px; border:1px solid var(--ddf-line); background:var(--ddf-field); font-size:12px; color:#bdb3c8; transition:all .18s; }
+.ddf-cards b { color:var(--ddf-accent-text); font:700 18px var(--ddf-head); line-height:1; }
+.ddf-cards label:hover span { border-color:#5d476d; transform:translateY(-2px); }
+.ddf-cards input:checked + span { border-color:var(--ddf-accent-hi); background:rgba(144,0,144,.24); color:#fff; box-shadow:0 0 16px rgba(144,0,144,.3); }
+.ddf-group { margin-top:6px; padding-left:14px; border-left:2px solid rgba(144,0,144,.55); }
+.ddf-group:not([hidden]) { animation:ddf-in .32s ease; }
+@keyframes ddf-in { from { opacity:0; transform:translateY(-8px); } }
+.ddf-check { display:flex; align-items:flex-start; gap:11px; margin-top:16px; color:#cfc7d8; font-size:12px; line-height:1.65; cursor:pointer; }
+.ddf-check input { flex:none; width:16px; height:16px; margin:3px 0 0; accent-color:var(--ddf-accent); }
+.ddf details { margin-top:22px; border:1px solid var(--ddf-line); background:var(--ddf-panel); }
+.ddf summary { padding:11px 14px; color:var(--ddf-accent-text); font-size:12px; cursor:pointer; list-style:none; }
+.ddf summary::before { content:"+ "; } .ddf details[open] summary::before { content:"– "; }
+.ddf pre { margin:0; padding:4px 14px 14px; color:#bdb3c8; font:inherit; font-size:12px; white-space:pre-wrap; word-break:break-word; max-height:260px; overflow:auto; }
+.ddf-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; }
+.ddf button { padding:12px 20px; border:1px solid var(--ddf-line); border-radius:0; background:transparent; color:#cfc7d8; font:inherit; font-size:13px; cursor:pointer; transition:all .2s; }
+.ddf button:hover:not(:disabled) { border-color:#7a5a8e; color:#fff; }
+.ddf button:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(144,0,144,.5); }
+.ddf button:disabled { opacity:.4; cursor:not-allowed; }
+.ddf button.ddf-send { position:relative; overflow:hidden; border-color:var(--ddf-accent); background:var(--ddf-accent); color:#fff; font-weight:700; letter-spacing:.04em; }
+.ddf button.ddf-send:hover:not(:disabled) { background:var(--ddf-accent-hi); border-color:var(--ddf-accent-hi); box-shadow:0 0 22px rgba(144,0,144,.55); }
+.ddf button.ddf-send::after { content:""; position:absolute; inset:0 auto 0 -60%; width:40%; background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent); transform:skewX(-20deg); }
+.ddf button.ddf-send:hover:not(:disabled)::after { animation:ddf-shine .8s ease; }
+@keyframes ddf-shine { to { left:130%; } }
+.ddf-status { min-height:1.6em; margin:14px 0 0; color:#e6d9ea; font-size:12px; }
+.ddf-fine { margin:18px 0 0; color:#74697e; font-size:11px; line-height:1.7; }
+.ddf-hp { position:absolute !important; left:-9999px; width:1px; height:1px; overflow:hidden; }
+.ddf-done { margin-top:26px; padding:26px; border:1px solid var(--ddf-accent); background:rgba(144,0,144,.1); }
+.ddf-done:focus { outline:none; }
+.ddf-done h3 { margin:0 0 8px; font:700 22px var(--ddf-head); }
+.ddf-id { display:inline-block; margin:6px 0 2px; padding:6px 12px; border:1px solid var(--ddf-accent-hi); background:#0a0810; color:#fff; font-weight:700; letter-spacing:.06em; }
+.ddf-tick { width:44px; height:44px; margin-bottom:14px; }
+.ddf-tick circle { fill:none; stroke:var(--ddf-accent-hi); stroke-width:2; stroke-dasharray:140; stroke-dashoffset:140; animation:ddf-draw .7s ease forwards; }
+.ddf-tick path { fill:none; stroke:#fff; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:30; stroke-dashoffset:30; animation:ddf-draw .45s .55s ease forwards; }
+@keyframes ddf-draw { to { stroke-dashoffset:0; } }
+@media (max-width:520px) { .ddf-actions button { flex:1 1 100%; } }
+@media (prefers-reduced-motion: reduce) { .ddf *, .ddf *::before, .ddf *::after { animation:none !important; transition:none !important; } .ddf-tick circle, .ddf-tick path { stroke-dashoffset:0; } }
+</style>
+
+<section class="ddf" id="ddf" aria-labelledby="ddf-title">
+  <div class="ddf-bar" aria-hidden="true"><i id="ddf-progress"></i></div>
+  <p class="ddf-kicker">/ support ticket</p>
+  <h2 id="ddf-title">send me a ticket.</h2>
+  <p class="ddf-lede">fill in as much as you want. the more you tell me, the less i have to ask you back. only the marked bits are required, and you can see exactly what gets sent before you send it.</p>
+  <p class="ddf-notice" id="ddf-off" hidden>this form isn't switched on yet, so it can't send anything. paste a web3forms access key into it and it will. you can still write your message and copy it as text.</p>
+
+  <div class="ddf-done" id="ddf-done" tabindex="-1" hidden>
+    <svg class="ddf-tick" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20"/><path d="M13 23l6 6 12-14"/></svg>
+    <h3>got it. it's in my inbox.</h3>
+    <p style="margin:0;color:var(--ddf-muted)">your ticket id is</p>
+    <span class="ddf-id" id="ddf-done-id"></span>
+    <p style="margin:12px 0 0;color:var(--ddf-muted)" id="ddf-done-how"></p>
+    <div class="ddf-actions"><button type="button" id="ddf-copy-id">copy ticket id</button><button type="button" id="ddf-again">send another</button></div>
+  </div>
+
+  <form id="ddf-form" novalidate autocomplete="off">
+    <fieldset>
+      <legend>01 · who's writing <span>so i know how to answer</span></legend>
+      <div class="ddf-row">
+        <div class="ddf-field"><label for="ddf-name">what should i call you <span class="ddf-opt">(optional)</span></label><input type="text" id="ddf-name" name="name" maxlength="60" placeholder="a name or a nickname"></div>
+        <div class="ddf-field"><label for="ddf-lang">language i should reply in</label>
+          <select id="ddf-lang" name="language"><option>English</option><option>Русский (Russian)</option><option>O‘zbekcha (Uzbek)</option><option>Тоҷикӣ (Tajik)</option><option>something else, i'll say in the message</option></select></div>
+      </div>
+      <div class="ddf-field"><span class="ddf-label" id="ddf-via-l">where should i reply?</span>
+        <div class="ddf-cards" role="radiogroup" aria-labelledby="ddf-via-l" id="ddf-via">
+          <label><input type="radio" name="via" value="email" checked><span><b>@</b>email</span></label>
+          <label><input type="radio" name="via" value="discord"><span><b>#</b>discord</span></label>
+          <label><input type="radio" name="via" value="github"><span><b>&lt;/&gt;</b>github</span></label>
+          <label><input type="radio" name="via" value="roblox"><span><b>▣</b>roblox</span></label>
+          <label><input type="radio" name="via" value="youtube"><span><b>▶</b>youtube</span></label>
+          <label><input type="radio" name="via" value="none"><span><b>–</b>no reply</span></label>
+        </div></div>
+      <div class="ddf-field" id="ddf-reply-wrap"><label for="ddf-reply" id="ddf-reply-l">your email</label><input type="text" id="ddf-reply" name="reply_to" maxlength="120" aria-describedby="ddf-reply-h ddf-reply-e"><p class="ddf-help" id="ddf-reply-h"></p><p class="ddf-err" id="ddf-reply-e" role="alert"></p></div>
+      <div class="ddf-row">
+        <div class="ddf-field"><label for="ddf-when">best time to reach you</label>
+          <select id="ddf-when" name="best_time"><option>anytime</option><option>mornings</option><option>afternoons</option><option>evenings</option><option>weekends</option></select></div>
+        <div class="ddf-field"><span class="ddf-label">your timezone</span><div id="ddf-tz" class="ddf-help" style="margin:0;padding:11px 0">…</div></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>02 · what's it about <span>pick the closest one</span></legend>
+      <div class="ddf-pills" role="radiogroup" aria-label="topic" id="ddf-topic">
+        <label><input type="radio" name="topic" value="bug" checked><span>a bug</span></label>
+        <label><input type="radio" name="topic" value="question"><span>a question about a project</span></label>
+        <label><input type="radio" name="topic" value="collab"><span>an idea / working together</span></label>
+        <label><input type="radio" name="topic" value="feedback"><span>feedback on the site</span></label>
+        <label><input type="radio" name="topic" value="other"><span>something else</span></label>
+      </div>
+      <div class="ddf-row">
+        <div class="ddf-field"><label for="ddf-prio">how urgent is it</label>
+          <select id="ddf-prio" name="priority"><option value="low">no rush</option><option value="normal" selected>normal</option><option value="urgent">something's broken right now</option></select></div>
+        <div class="ddf-field ddf-group" data-for="question collab" hidden><label for="ddf-proj">which project</label>
+          <select id="ddf-proj" name="project"><option>SecureText</option><option>Neurux</option><option>CK:RP tools</option><option>donidonka.info</option><option>none of these / general</option></select></div>
+      </div>
+      <div class="ddf-field"><label for="ddf-subj">subject <span class="ddf-opt">· required</span></label><input type="text" id="ddf-subj" name="subject_line" maxlength="80" aria-describedby="ddf-subj-e"><p class="ddf-err" id="ddf-subj-e" role="alert"></p></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>03 · the details <span>the long part, take your time</span></legend>
+      <div class="ddf-field"><label for="ddf-msg">your message <span class="ddf-opt">· required</span></label><textarea id="ddf-msg" name="message" maxlength="3000" aria-describedby="ddf-msg-e ddf-count" placeholder="say it however you'd say it out loud."></textarea>
+        <p class="ddf-meta"><span id="ddf-count">0 / 3000</span><span id="ddf-draft"></span></p><p class="ddf-err" id="ddf-msg-e" role="alert"></p></div>
+
+      <div class="ddf-group" data-for="bug" hidden>
+        <div class="ddf-field"><label for="ddf-page">where did it happen <span class="ddf-opt">(page or link)</span></label><input type="url" id="ddf-page" name="page_affected" maxlength="300" placeholder="https://donidonka.info/…"></div>
+        <div class="ddf-field"><label for="ddf-steps">how do i make it happen again</label><textarea id="ddf-steps" name="steps_to_reproduce" maxlength="1500" style="min-height:96px" placeholder="1. open…&#10;2. click…&#10;3. …"></textarea></div>
+        <div class="ddf-row">
+          <div class="ddf-field"><label for="ddf-exp">what you expected</label><textarea id="ddf-exp" name="expected" maxlength="600" style="min-height:76px"></textarea></div>
+          <div class="ddf-field"><label for="ddf-act">what actually happened</label><textarea id="ddf-act" name="actual" maxlength="600" style="min-height:76px"></textarea></div>
+        </div>
+        <div class="ddf-row">
+          <div class="ddf-field"><label for="ddf-freq">how often</label><select id="ddf-freq" name="how_often"><option>every time</option><option>sometimes</option><option>it happened once</option></select></div>
+          <div class="ddf-field"><label for="ddf-dev">what you're on</label><select id="ddf-dev" name="device_type"><option>desktop</option><option>laptop</option><option>phone</option><option>tablet</option></select></div>
+        </div>
+      </div>
+
+      <div class="ddf-group" data-for="collab" hidden>
+        <div class="ddf-field"><label for="ddf-idea">what do you want to build</label><textarea id="ddf-idea" name="the_idea" maxlength="1200" style="min-height:96px"></textarea></div>
+        <div class="ddf-row">
+          <div class="ddf-field"><label for="ddf-time">rough timeline</label><select id="ddf-time" name="timeline"><option>no deadline</option><option>a few weeks</option><option>a month or two</option><option>it's urgent</option></select></div>
+          <div class="ddf-field"><label for="ddf-role">what you'd want from me</label><select id="ddf-role" name="what_they_want"><option>advice</option><option>to build it together</option><option>to hire / commission it</option><option>not sure yet</option></select></div>
+        </div>
+      </div>
+
+      <div class="ddf-field"><label for="ddf-link">a link that helps <span class="ddf-opt">(screenshot, video, repo — optional)</span></label><input type="url" id="ddf-link" name="helpful_link" maxlength="300" placeholder="https://…"></div>
+      <label class="ddf-check"><input type="checkbox" id="ddf-tech" name="include_tech_info" value="yes" checked><span>include my browser, screen size and language, so i can reproduce things.</span></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>04 · before it goes <span>nothing hidden</span></legend>
+      <label class="ddf-check"><input type="checkbox" id="ddf-ok" name="agreed_to_terms" value="yes"><span>i get that this passes through a form service (web3forms) that emails it to the site owner. <span class="ddf-opt">required</span></span></label>
+      <p class="ddf-err" id="ddf-ok-e" role="alert"></p>
+      <div class="ddf-hp" aria-hidden="true"><label>leave empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label><label><input type="checkbox" name="botcheck" tabindex="-1"> no</label></div>
+      <details id="ddf-prev"><summary>see exactly what will be sent</summary><pre id="ddf-prev-pre"></pre></details>
+      <div class="ddf-actions">
+        <button type="submit" class="ddf-send" id="ddf-send">send ticket</button>
+        <button type="button" id="ddf-copy">copy as text instead</button>
+        <button type="button" id="ddf-reset">clear everything</button>
+      </div>
+      <p class="ddf-status" id="ddf-status" role="status" aria-live="polite"></p>
+      <p class="ddf-fine">spam protection here is light (a hidden trap field, a short wait, and a limit of one ticket a minute and five a day). it keeps simple bots out, not determined ones. your draft is saved on this device only, until you send or clear it.</p>
+    </fieldset>
+  </form>
+</section>
+
+<script>
+(() => {
+  "use strict";
+  const ACCESS_KEY = "";   // ← paste your web3forms access key here if this isn't on your site's config.js
+  const ENDPOINT = "https://api.web3forms.com/submit";
+  const root = document.getElementById("ddf"); if (!root || root.dataset.on) return; root.dataset.on = "1";
+  const $ = (id) => document.getElementById(id), form = $("ddf-form"), f = form.elements;
+  const cfg = (window.DD_CONFIG && window.DD_CONFIG.ticketFields) || {}, key = cfg.access_key || ACCESS_KEY, enabled = Boolean(key);
+  const ep = (window.DD_CONFIG && window.DD_CONFIG.ticketEndpoint) || ENDPOINT;
+  const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} }, del: (k) => { try { localStorage.removeItem(k); } catch {} } };
+  const opened = Date.now(), say = (t) => { $("ddf-status").textContent = t; };
+  const TOPICS = { bug: "bug", question: "question about a project", collab: "idea / working together", feedback: "feedback on the site", other: "something else" };
+  const CH = {
+    email:   { label: "your email", help: "that's where i'll write back.", ph: "you@example.com", ok: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v), bad: "that doesn't look like an email address." },
+    discord: { label: "your discord username", help: "the username, not the display name. no @ needed.", ph: "username", ok: (v) => /^@?[a-zA-Z0-9_.]{2,32}(#\d{4})?$/.test(v), bad: "discord usernames are 2–32 letters, numbers, dots or underscores." },
+    github:  { label: "your github username", help: "i'll look for you there.", ph: "octocat", ok: (v) => /^@?[a-zA-Z\d](?:[a-zA-Z\d]|-(?=[a-zA-Z\d])){0,38}$/.test(v), bad: "that isn't a valid github username." },
+    roblox:  { label: "your roblox username", help: "the username, not the display name.", ph: "username", ok: (v) => /^[A-Za-z0-9_]{3,20}$/.test(v), bad: "roblox usernames are 3–20 letters, numbers or underscores." },
+    youtube: { label: "your youtube channel", help: "a channel name or an @handle.", ph: "@yourchannel", ok: (v) => v.length >= 2 && v.length <= 60, bad: "type your channel name or @handle." },
+    none:    { label: "", help: "", ph: "", ok: () => true, bad: "" }
+  };
+  $("ddf-tz").textContent = (Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown") + "  ·  local time " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  if (!enabled) { $("ddf-off").hidden = false; $("ddf-send").disabled = true; }
+  const pageField = $("ddf-page"); if (!pageField.value) pageField.value = document.referrer || location.href;
+
+  const val = (n) => (f[n] && f[n].value ? f[n].value.trim() : "");
+  const via = () => form.querySelector('input[name="via"]:checked').value, topic = () => form.querySelector('input[name="topic"]:checked').value;
+
+  // show only the parts that matter for the chosen topic; hidden fields are disabled so they never get sent
+  function sync() {
+    const t = topic(), c = CH[via()];
+    form.querySelectorAll(".ddf-group").forEach((g) => { const on = g.dataset.for.split(" ").includes(t); g.hidden = !on; g.querySelectorAll("input,select,textarea").forEach((el) => { el.disabled = !on; }); });
+    $("ddf-reply-wrap").hidden = via() === "none"; f.reply_to.disabled = via() === "none";
+    $("ddf-reply-l").textContent = c.label; $("ddf-reply-h").textContent = c.help; f.reply_to.placeholder = c.ph; f.reply_to.type = via() === "email" ? "email" : "text";
+    $("ddf-count").textContent = f.message.value.length + " / 3000"; progress(); preview();
+  }
+  function progress() {
+    const checks = [val("subject_line").length >= 3, val("message").length >= 10, f.agreed_to_terms.checked, via() === "none" || CH[via()].ok(val("reply_to"))];
+    $("ddf-progress").style.width = (checks.filter(Boolean).length / checks.length * 100) + "%";
+  }
+  function entries(id) {   // the one list that drives the email, the preview and the copy button
+    const e = [["ticket id", id || "(made when you send)"], ["topic", TOPICS[topic()]], ["priority", f.priority.options[f.priority.selectedIndex].text]];
+    if (val("name")) e.push(["name", val("name")]);
+    e.push(["reply via", via() === "none" ? "no reply needed" : via()]); if (via() !== "none") e.push(["reply to", val("reply_to") || "(empty)"]);
+    e.push(["reply language", val("language")], ["best time", val("best_time")], ["timezone", Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown"]);
+    ["project", "page_affected", "how_often", "device_type", "steps_to_reproduce", "expected", "actual", "the_idea", "timeline", "what_they_want", "helpful_link"].forEach((n) => { if (f[n] && !f[n].disabled && val(n)) e.push([n.replace(/_/g, " "), val(n)]); });
+    if (f.include_tech_info.checked) e.push(["browser", navigator.userAgent], ["screen", screen.width + "x" + screen.height + " (window " + innerWidth + "x" + innerHeight + ", dpr " + devicePixelRatio + ")"], ["browser language", navigator.language], ["reduced motion", String(matchMedia("(prefers-reduced-motion: reduce)").matches)]);
+    e.push(["sent from", location.href]); return e;
+  }
+  const asText = (id) => "subject: " + val("subject_line") + "\n\nmessage:\n" + val("message") + "\n\n" + entries(id).map(([k, v]) => k + ": " + v).join("\n");
+  const preview = () => { $("ddf-prev-pre").textContent = asText(null); };
+
+  // draft saved while you type (this device only)
+  const KEY = "ddf-draft-v1"; let t = 0;
+  try { const d = JSON.parse(store.get(KEY) || "null"); if (d) Object.entries(d).forEach(([n, v]) => { const el = f[n]; if (!el) return; if (el.length && el[0] && el[0].type === "radio") { Array.from(el).forEach((r) => { r.checked = r.value === v; }); } else if (el.type === "checkbox") el.checked = !!v; else el.value = v; }); } catch {}
+  const save = () => { const d = {}; Array.from(form.elements).forEach((el) => { if (!el.name || el.name === "website" || el.name === "botcheck") return; if (el.type === "radio") { if (el.checked) d[el.name] = el.value; } else if (el.type === "checkbox") d[el.name] = el.checked; else if (el.value) d[el.name] = el.value; });
+    if (val("subject_line") || val("message")) { store.set(KEY, JSON.stringify(d)); $("ddf-draft").textContent = "draft saved on this device"; } else { store.del(KEY); $("ddf-draft").textContent = ""; } };
+  form.addEventListener("input", () => { sync(); clearTimeout(t); t = setTimeout(save, 500); });
+  form.addEventListener("change", () => { sync(); clearTimeout(t); t = setTimeout(save, 500); });
+  sync();
+
+  const mkId = () => { const d = new Date(), p = (n) => String(n).padStart(2, "0"), abc = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let r = ""; crypto.getRandomValues(new Uint8Array(4)).forEach((x) => { r += abc[x % abc.length]; }); return "DD-" + String(d.getFullYear()).slice(2) + p(d.getMonth() + 1) + p(d.getDate()) + "-" + r; };
+  function validate() {
+    [["ddf-subj-e", "subject_line"], ["ddf-msg-e", "message"], ["ddf-reply-e", "reply_to"]].forEach(([e, n]) => { $(e).textContent = ""; f[n].removeAttribute("aria-invalid"); }); $("ddf-ok-e").textContent = "";
+    let first = null; const bad = (e, n, m) => { $(e).textContent = m; if (f[n]) f[n].setAttribute("aria-invalid", "true"); first = first || (f[n] || $("ddf-ok")); };
+    if (via() !== "none" && !CH[via()].ok(val("reply_to"))) bad("ddf-reply-e", "reply_to", val("reply_to") ? CH[via()].bad : "tell me where to reply, or pick \"no reply needed\".");
+    if (val("subject_line").length < 3) bad("ddf-subj-e", "subject_line", "give it a short subject (3+ characters).");
+    if (val("message").length < 10) bad("ddf-msg-e", "message", "tell me a bit more (10+ characters).");
+    if (!f.agreed_to_terms.checked) bad("ddf-ok-e", "agreed_to_terms", "tick this one so i know you're ok with how it's sent.");
+    return first;
+  }
+  $("ddf-copy").addEventListener("click", async () => { try { await navigator.clipboard.writeText(asText("(not sent)")); say("copied. you can paste it anywhere."); } catch { say("your browser blocked copying. open \"see exactly what will be sent\" and copy it from there."); } });
+  $("ddf-reset").addEventListener("click", () => { if (!confirm("clear everything you've typed?")) return; form.reset(); store.del(KEY); $("ddf-draft").textContent = ""; sync(); say("cleared."); });
+  $("ddf-copy-id").addEventListener("click", async () => { try { await navigator.clipboard.writeText($("ddf-done-id").textContent); say("ticket id copied."); } catch {} });
+  $("ddf-again").addEventListener("click", () => { $("ddf-done").hidden = true; form.hidden = false; f.subject_line.focus(); });
+
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault(); if (!enabled) return; say("");
+    const bad = validate(); if (bad) { bad.focus(); say("a few things need fixing first."); return; }
+    if (f.website.value || f.botcheck.checked) { say("couldn't send that. if you're a real person, reload the page and try again."); return; }
+    if (Date.now() - opened < 2500) { say("that was quick. give it a second and try again."); return; }
+    const now = Date.now(), log = (() => { try { return JSON.parse(store.get("ddf-log") || "[]"); } catch { return []; } })().filter((x) => now - x < 864e5);
+    if (log.length && now - log[log.length - 1] < 60000) { say("wait " + Math.ceil((60000 - (now - log[log.length - 1])) / 1000) + "s before sending another one."); return; }
+    if (log.length >= 5) { say("that's five tickets today already. try again tomorrow."); return; }
+    const id = mkId(), fd = new FormData(); fd.append("access_key", key);
+    fd.append("subject", "[" + id + "] " + TOPICS[topic()] + (f.priority.value === "urgent" ? " (URGENT)" : "") + ": " + val("subject_line"));
+    fd.append("from_name", "donidonka.info tickets"); fd.append("message", asText(id));
+    if (via() === "email") fd.append("email", val("reply_to"));
+    entries(id).forEach(([k, v]) => fd.append(k.replace(/ /g, "_"), v));   // clean keys like ticket_id, so email templates can use {field:ticket_id}
+    const btn = $("ddf-send"); btn.disabled = true; btn.textContent = "sending…"; say("sending…");
+    const ctrl = new AbortController(), to = setTimeout(() => ctrl.abort(), 15000);
+    try {
+      const res = await fetch(ep, { method: "POST", headers: { Accept: "application/json" }, body: fd, signal: ctrl.signal });
+      let data = {}; try { data = await res.json(); } catch {}
+      if (!(res.ok && data.success !== false && data.ok !== false)) throw new Error(typeof data.message === "string" ? data.message.slice(0, 140) : "the form service said no (" + res.status + ")");
+      const sentVia = via(); log.push(now); store.set("ddf-log", JSON.stringify(log)); store.del(KEY); form.reset(); sync(); $("ddf-draft").textContent = "";
+      $("ddf-done-id").textContent = id; $("ddf-done-how").textContent = sentVia === "none" ? "no reply needed, so i won't write back unless i have to." : "i'll reply through " + sentVia + ", the way you picked.";
+      form.hidden = true; $("ddf-done").hidden = false; $("ddf-done").focus();
+    } catch (err) {
+      say(err.name === "AbortError" ? "that took too long. check your connection and try again. your message is still here." : "couldn't send it: " + err.message + ". your message is still here, so you can try again or copy it as text.");
+    } finally { clearTimeout(to); btn.disabled = !enabled; btn.textContent = "send ticket"; }
+  });
+})();
+</script>

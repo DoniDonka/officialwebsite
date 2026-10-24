@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>the pad — donidonka</title>
+<meta name="description" content="a hidden page: a tiny sketchpad.">
+<meta name="theme-color" content="#030405">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="extras.css">
+<script src="script.js" defer></script>
+<script src="config.js" defer></script>
+<script src="extras.js" defer></script>
+<script src="nav.js" defer></script>
+<link rel="icon" type="image/png" href="assets/profile-rifle.png">
+<meta property="og:title" content="the pad — donidonka">
+<meta property="og:description" content="a hidden page: a tiny sketchpad.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://donidonka.info/pad.html">
+<meta property="og:image" content="https://donidonka.info/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#030405">
+<link rel="canonical" href="https://donidonka.info/pad.html">
+<script>try{if(!sessionStorage.getItem('dd-intro')){document.documentElement.classList.add('dd-intro');sessionStorage.setItem('dd-intro','1');setTimeout(function(){document.documentElement.classList.remove('dd-intro')},2400)}}catch(e){}</script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="alternate" type="application/atom+xml" title="donidonka.info updates" href="feed.xml">
+<meta name="robots" content="noindex">
+<script>try{var a=localStorage.getItem('dd-accent');if(a)document.documentElement.dataset.accent=a;var z=localStorage.getItem('dd-text');if(z)document.documentElement.style.setProperty('--dd-zoom',z)}catch(e){}</script>
+</head>
+<body><div class="site-shell">
+<header class="site-header">
+<a class="brand" href="index.html" aria-label="DoniDonka home"><span class="brand-mark">D/</span><span class="brand-name">DONIDONKA<span class="brand-cursor">_</span></span></a>
+<button class="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">menu <span aria-hidden="true">＋</span></button>
+<nav class="main-nav" id="main-navigation" aria-label="Main navigation">
+<a class="nav-link" href="index.html">home</a><a class="nav-link" href="projects.html">projects</a><a class="nav-link" href="links.html">links</a><a class="nav-link" href="about.html">about</a><a class="nav-link" href="gallery.html">gallery</a><a class="nav-link" href="updates.html">updates</a><a class="nav-link" href="contact.html">contact</a>
+</nav></header><main>
+<section class="page-hero"><div class="page-label">/ PAD · HIDDEN</div><h1>the pad.</h1><p>you found it. draw something. it stays on this device, and you can save it as a picture.</p></section>
+<section class="page-content"><div class="pad-wrap"><canvas id="pad-canvas" role="img" aria-label="sketchpad: draw with your mouse, finger or pen"></canvas></div>
+<div class="pad-tools" role="toolbar" aria-label="sketchpad tools">
+<button type="button" data-tool="pencil" aria-pressed="true">pencil</button><button type="button" data-tool="eraser" aria-pressed="false">eraser</button>
+<label class="pad-size">size <input type="range" id="pad-size" min="1" max="28" value="3"></label>
+<span class="pad-colors" id="pad-colors"><button type="button" data-c="#e5e5e5" style="--c:#e5e5e5" aria-label="white" aria-pressed="true"></button><button type="button" data-c="#858585" style="--c:#858585" aria-label="gray"></button><button type="button" data-c="accent" style="--c:rgb(206,120,206)" aria-label="accent colour"></button></span>
+<button type="button" id="pad-undo">undo</button><button type="button" id="pad-clear">clear</button><button type="button" id="pad-save">save as picture</button></div>
+<p class="ticket-note">your sketch is kept on this device only. z undoes, and the pencil leaves a thicker line the harder you press on a pen screen.</p></section>
+</main>
+<div class="music-player music-player-global" aria-label="background music player">
+<audio id="background-audio" preload="metadata" autoplay loop><source src="assets/moog-city-light.mp3" type="audio/mpeg"></audio>
+<button class="music-play-button" id="music-play-button" type="button" aria-label="play background music" aria-pressed="false"><span class="music-play-symbol" aria-hidden="true">▶</span></button>
+<div class="music-details"><p class="music-eyebrow">music</p><p class="music-title">moog city <span>· slowed + reverb</span></p><p class="music-status" id="music-status" aria-live="polite">tap play if your browser blocks autoplay</p><div class="music-timeline"><span class="music-time" id="music-current-time">0:00</span><input class="music-seek" id="music-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="seek through music"><span class="music-time" id="music-duration">0:00</span></div></div>
+<label class="music-volume-control"><span class="visually-hidden">music volume</span><span class="volume-symbol" aria-hidden="true">volume</span><input id="music-volume" type="range" min="0" max="100" value="30" aria-label="music volume"></label></div><footer class="site-footer"><span class="footer-line"></span><a href="index.html" class="footer-domain">DONIDONKA.INFO</a><span class="footer-line"></span><p class="footer-note">made by donidonka · <a href="updates.html">site updates</a></p></footer></div></body></html>
