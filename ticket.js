@@ -7,7 +7,7 @@
         if (!form || form.dataset.on) return; form.dataset.on = "1";
         const cfg = window.DD_CONFIG || {}, fields = cfg.ticketFields || {}, endpoint = cfg.ticketEndpoint || "";
         const enabled = Boolean(endpoint) && Object.values(fields).every(Boolean);
-        const el = (id) => document.getElementById(id), f = form.elements, box = el("t-adv-box"), advBtn = el("t-adv");
+        const el = (id) => document.getElementById(id), f = form.elements, box = el("t-adv-box"), more = el("t-adv-more"), boxes = [box, more], advBtn = el("t-adv"), advNote = el("t-adv-note"), noteOff = advNote.innerHTML;
         const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} }, del: (k) => { try { localStorage.removeItem(k); } catch {} } };
         const opened = Date.now(), topics = { bug: "bug on the site", question: "question about a project", idea: "idea or collab", other: "something else" };
         const status = (t) => { el("ticket-status").textContent = t; };
@@ -33,13 +33,14 @@
         // ---- what's visible depends on the mode and on the topic ----
         function sync() {
             const on = adv(), t = f.topic.value, via = f.reply_via.value;
-            box.querySelectorAll("input,select,textarea").forEach((x) => { x.disabled = !on; });
-            box.querySelectorAll("[data-for]").forEach((g) => { const show = on && g.dataset.for.split(" ").includes(t); g.hidden = !show; g.querySelectorAll("input,select,textarea").forEach((x) => { x.disabled = !show; }); });
+            boxes.forEach((bx) => bx.querySelectorAll("input,select,textarea").forEach((x) => { x.disabled = !on; }));
+            more.querySelectorAll("[data-for]").forEach((g) => { const show = on && g.dataset.for.split(" ").includes(t); g.hidden = !show; g.querySelectorAll("input,select,textarea").forEach((x) => { x.disabled = !show; }); });
             const c = CH[on ? via : "email"];
             el("t-reply-wrap").hidden = on && via === "none"; f.reply.disabled = on && via === "none";
             el("t-reply-l").firstChild.textContent = on ? c.label + " " : "how can i reply? "; f.reply.placeholder = on ? c.ph : "an email, or a discord / github name";
             el("t-reply-opt").textContent = on && via !== "none" ? "(needed so i can answer)" : "(optional)";
             advBtn.setAttribute("aria-pressed", String(on)); advBtn.setAttribute("aria-expanded", String(on)); advBtn.textContent = on ? "advanced mode: on" : "advanced mode";
+            advNote.innerHTML = on ? "advanced options are open just below. bug and idea details show up under your message box." : noteOff;
             count(); preview();
         }
         const count = () => { el("t-count").textContent = f.message.value.length + " / 2000"; };
@@ -62,13 +63,13 @@
 
         // ---- draft: every field, kept while you click around, cleared once sent ----
         const draftKey = "dd-ticket-draft"; let draftTimer = 0;
-        if (store.get("dd-ticket-adv") === "1") box.hidden = false;
+        if (store.get("dd-ticket-adv") === "1") boxes.forEach((bx) => { bx.hidden = false; });
         try { const d = JSON.parse(store.get(draftKey) || "null"); if (d) Object.entries(d).forEach(([n, v]) => { const x = f[n]; if (!x || x.name === "website") return; if (x.type === "checkbox") x.checked = !!v; else if (n === "topic" && q) return; else x.value = v; }); } catch {}
         const save = () => { const d = {}; Array.from(form.elements).forEach((x) => { if (!x.name || x.name === "website" || x.type === "submit" || x.type === "button") return; if (x.type === "checkbox") d[x.name] = x.checked; else if (x.value) d[x.name] = x.value; });
             if (val("subject") || val("message") || val("reply")) { store.set(draftKey, JSON.stringify(d)); el("t-draft").textContent = "draft saved on this device"; } else { store.del(draftKey); el("t-draft").textContent = ""; } };
         const later = () => { sync(); clearTimeout(draftTimer); draftTimer = setTimeout(save, 500); };
         form.addEventListener("input", later); form.addEventListener("change", later);
-        advBtn.addEventListener("click", () => { box.hidden = !box.hidden; store.set("dd-ticket-adv", box.hidden ? "0" : "1"); sync(); if (!box.hidden) f.priority.focus(); });
+        advBtn.addEventListener("click", () => { const open = box.hidden; boxes.forEach((bx) => { bx.hidden = !open; }); store.set("dd-ticket-adv", open ? "1" : "0"); sync(); if (open) { f.priority.focus({ preventScroll: true }); box.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); } });
 
         const mine = () => { try { return JSON.parse(store.get("dd-tickets") || "[]"); } catch { return []; } };
         const renderMine = () => { const list = mine(), ul = el("ticket-list"); el("ticket-mine").hidden = !list.length; ul.textContent = "";
